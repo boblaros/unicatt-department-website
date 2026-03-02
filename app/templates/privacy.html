@@ -1,7 +1,27 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% block title %}{% trans "Privacy" %}{% endblock %}
+
 {% block content %}
-<h1>{% trans "Privacy Policy" %}</h1>
-<p>{% trans "This is a placeholder privacy policy page. Please replace with official legal text." %}</p>
+{% get_current_language as CURRENT_LANGUAGE %}
+<section class="section pt-0">
+  <div class="panel reveal">
+    <h1 class="headline" style="margin-bottom:14px;">
+      <small>{% if CURRENT_LANGUAGE == 'it' %}Informazioni legali{% else %}Legal information{% endif %}</small>
+      {% if CURRENT_LANGUAGE == 'it' %}
+        PRIVACY<br>POLICY.
+      {% else %}
+        PRIVACY<br>POLICY.
+      {% endif %}
+    </h1>
+
+    {% if CURRENT_LANGUAGE == 'it' %}
+      <p class="blurb">Questa pagina è un segnaposto e deve essere sostituita con il testo legale ufficiale dell'università.</p>
+      <p>La struttura visuale è stata aggiornata; il contenuto normativo definitivo va inserito dal team legale.</p>
+    {% else %}
+      <p class="blurb">This page is a placeholder and should be replaced with the official legal text of the university.</p>
+      <p>The visual layout is updated; final policy content should be provided by your legal team.</p>
+    {% endif %}
+  </div>
+</section>
 {% endblock %}

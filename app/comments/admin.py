@@ -10,7 +10,7 @@ class CommentAdmin(admin.ModelAdmin):
     search_fields = ('body', 'author__email', 'post__title_en', 'post__title_it')
 
     def _can_manage(self, request):
-        return request.user.is_superuser or request.user.is_moderator
+        return bool(getattr(request.user, 'is_superuser', False) or getattr(request.user, 'is_moderator', False))
 
     def has_module_permission(self, request):
         return self._can_manage(request)

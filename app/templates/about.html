@@ -1,11 +1,35 @@
 {% extends 'base.html' %}
-{% block title %}About{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "About" %}{% endblock %}
+
 {% block content %}
-{% if LANGUAGE_CODE == 'it' %}
-<h1>Dipartimento Integrazione Studenti Internazionali</h1>
-<p>Questo dipartimento supporta gli studenti internazionali con orientamento, attività interculturali e comunicazioni accademiche.</p>
-{% else %}
-<h1>International Student Integration Department</h1>
-<p>This department supports international students with orientation, intercultural initiatives, and academic communications.</p>
-{% endif %}
+{% get_current_language as CURRENT_LANGUAGE %}
+<section class="section pt-0">
+  <div class="panel reveal">
+    <h1 class="headline" style="margin-bottom:14px;">
+      <small>{% if CURRENT_LANGUAGE == 'it' %}Dipartimento{% else %}Department{% endif %}</small>
+      {% if CURRENT_LANGUAGE == 'it' %}
+        INTEGRAZIONE<br>STUDENTI.
+      {% else %}
+        STUDENT<br>INTEGRATION.
+      {% endif %}
+    </h1>
+
+    {% if CURRENT_LANGUAGE == 'it' %}
+      <p class="blurb">Supportiamo studenti internazionali con orientamento, iniziative interculturali e comunicazione accademica.</p>
+      <div class="tiles">
+        <article class="tile"><div class="tile-head"><strong>Orientamento</strong><span class="tile-index">01</span></div><p>Supporto pratico per l'inserimento nel campus e nei servizi universitari.</p></article>
+        <article class="tile"><div class="tile-head"><strong>Comunità</strong><span class="tile-index">02</span></div><p>Attività per creare connessioni tra studenti locali e internazionali.</p></article>
+        <article class="tile"><div class="tile-head"><strong>Comunicazioni</strong><span class="tile-index">03</span></div><p>Notizie ufficiali e aggiornamenti rilevanti in piattaforma.</p></article>
+      </div>
+    {% else %}
+      <p class="blurb">We support international students with orientation, intercultural initiatives, and academic communication.</p>
+      <div class="tiles">
+        <article class="tile"><div class="tile-head"><strong>Orientation</strong><span class="tile-index">01</span></div><p>Practical onboarding support for campus life and university services.</p></article>
+        <article class="tile"><div class="tile-head"><strong>Community</strong><span class="tile-index">02</span></div><p>Activities to connect local and international students.</p></article>
+        <article class="tile"><div class="tile-head"><strong>Communication</strong><span class="tile-index">03</span></div><p>Official updates and relevant department information.</p></article>
+      </div>
+    {% endif %}
+  </div>
+</section>
 {% endblock %}

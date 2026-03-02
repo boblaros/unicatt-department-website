@@ -1,3 +1,7 @@
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+
+from django.conf import settings
+from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
 from posts.models import Post
@@ -18,3 +22,50 @@ class AboutView(TemplateView):
 
 class PrivacyView(TemplateView):
     template_name = 'privacy.html'
+
+
+def switch_language(request, lang_code):
+    allowed_languages = {code for code, _ in settings.LANGUAGES}
+    if lang_code not in allowed_languages:
+        lang_code = settings.LANGUAGE_CODE
+
+    next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') or '/'
+    parsed = urlparse(next_url)
+    if parsed.netloc:
+        next_url = '/'
+        parsed = urlparse(next_url)
+
+    path = parsed.path or '/'
+    for code, _ in settings.LANGUAGES:
+        exact = f'/{code}'
+        prefix = f'/{code}/'
+        if path == exact:
+            path = '/'
+            break
+        if path.startswith(prefix):
+            path = f"/{path[len(prefix):]}"
+            break
+
+    if not path.startswith('/'):
+        path = f'/{path}'
+
+    if lang_code == settings.LANGUAGE_CODE:
+        target_path = path
+    else:
+        target_path = f'/{lang_code}{path}' if path != '/' else f'/{lang_code}/'
+
+    clean_query = urlencode(parse_qsl(parsed.query, keep_blank_values=True), doseq=True)
+    translated_url = urlunparse(('', '', target_path, '', clean_query, parsed.fragment))
+    response = redirect(translated_url)
+
+    response.set_cookie(
+        settings.LANGUAGE_COOKIE_NAME,
+        lang_code,
+        max_age=settings.LANGUAGE_COOKIE_AGE,
+        path=settings.LANGUAGE_COOKIE_PATH,
+        domain=settings.LANGUAGE_COOKIE_DOMAIN,
+        secure=settings.LANGUAGE_COOKIE_SECURE,
+        httponly=settings.LANGUAGE_COOKIE_HTTPONLY,
+        samesite=settings.LANGUAGE_COOKIE_SAMESITE,
+    )
+    return response

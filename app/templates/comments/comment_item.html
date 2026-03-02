@@ -1,29 +1,32 @@
-<div class="comment-item ms-{{ depth|add:'0' }} mb-3 p-2 border rounded">
-  <div class="d-flex justify-content-between align-items-center">
-    <strong>{{ comment.author.full_name|default:comment.author.email }}</strong>
-    <small>{{ comment.created_at|date:"Y-m-d H:i" }}</small>
+{% load i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
+<article class="comment-card ms-{{ depth|add:'0' }} mt-2">
+  <div class="comment-head">
+    <span class="comment-author">{{ comment.author.full_name|default:comment.author.email }}</span>
+    <span class="comment-time">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
   </div>
-  <p class="mb-2">{{ comment.body }}</p>
+
+  <p class="comment-text">{{ comment.body }}</p>
 
   {% if request.user.is_authenticated and request.user.is_verified_student and not request.user.is_banned and depth < 5 and not comment.soft_deleted %}
-  <form method="post" action="{% url 'comments:create' comment.post.slug %}" class="mb-2">
-    {% csrf_token %}
-    <input type="hidden" name="parent_id" value="{{ comment.id }}">
-    <textarea name="body" rows="2" class="form-control mb-2" placeholder="Reply"></textarea>
-    <button type="submit" class="btn btn-sm btn-outline-primary">Reply</button>
-  </form>
+    <form method="post" action="{% url 'comments:create' comment.post.slug %}" class="reply-form mb-2">
+      {% csrf_token %}
+      <input type="hidden" name="parent_id" value="{{ comment.id }}">
+      <textarea name="body" rows="2" class="input-control" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}"></textarea>
+      <button type="submit" class="gc-btn gc-btn-ghost">{% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}</button>
+    </form>
   {% endif %}
 
   {% if request.user.is_authenticated and not comment.soft_deleted %}
     {% if request.user == comment.author or request.user.is_moderator or request.user.is_superuser %}
-    <form method="post" action="{% url 'comments:delete' comment.id %}">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-    </form>
+      <form method="post" action="{% url 'comments:delete' comment.id %}">
+        {% csrf_token %}
+        <button type="submit" class="gc-btn gc-btn-ghost">{% if CURRENT_LANGUAGE == 'it' %}Elimina{% else %}Delete{% endif %}</button>
+      </form>
     {% endif %}
   {% endif %}
 
   {% for reply in comment.replies.all %}
     {% include 'comments/comment_item.html' with comment=reply depth=depth|add:1 %}
   {% endfor %}
-</div>
+</article>

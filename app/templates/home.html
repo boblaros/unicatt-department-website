@@ -1,26 +1,429 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% block title %}{% trans "Home" %} - UCSC Integration{% endblock %}
-{% block content %}
-<section class="p-4 p-md-5 rounded-4 hero mb-4">
-  <h1 class="display-6">{% trans "International Student Integration" %}</h1>
-  <p class="lead mb-0">{% trans "Welcome to the department website of Università Cattolica del Sacro Cuore." %}</p>
-</section>
 
-<h2 class="h4 mb-3">{% trans "Latest News" %}</h2>
-<div class="row g-3">
-  {% for post in latest_posts %}
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-body">
-        <h3 class="h6">{{ post.title_en }}</h3>
-        <p class="small text-muted">{{ post.published_at|date:"Y-m-d" }}</p>
-        <a href="{% url 'posts:detail' post.slug %}" class="btn btn-primary btn-sm">{% trans "Read" %}</a>
+{% block content %}
+{% get_current_language as CURRENT_LANGUAGE %}
+
+<section class="hero-section">
+  <div class="hero-grid">
+    <div class="reveal">
+      <div class="kicker"><span class="pulse"></span>
+        {% if CURRENT_LANGUAGE == 'it' %}
+          Studenti locali + internazionali
+        {% else %}
+          Local + international students
+        {% endif %}
+      </div>
+
+      <h1 class="mega-title">
+        {% if CURRENT_LANGUAGE == 'it' %}
+          CONNETTITI.<br>PARLA <span class="stroke">LINGUE</span>.
+        {% else %}
+          CONNECT.<br>SPEAK <span class="stroke">LANGUAGES</span>.
+        {% endif %}
+      </h1>
+
+      <p class="subline">
+        {% if CURRENT_LANGUAGE == 'it' %}
+          Benvenuti nel dipartimento di integrazione dell'Università Cattolica del Sacro Cuore.
+          Qui trovi notizie, attività e strumenti utili per inserirti rapidamente nella vita universitaria.
+        {% else %}
+          Welcome to Università Cattolica del Sacro Cuore integration department.
+          Find news, activities, and practical support to settle into campus life faster.
+        {% endif %}
+      </p>
+
+      <p class="microcopy">
+        {% if CURRENT_LANGUAGE == 'it' %}
+          La piattaforma resta con la logica attuale: area notizie, autenticazione studenti verificati e commenti moderati.
+        {% else %}
+          The platform keeps the current logic: news area, verified student authentication, and moderated comments.
+        {% endif %}
+      </p>
+
+      <div class="cta-row">
+        {% if request.user.is_authenticated %}
+          <a class="gc-btn gc-btn-primary" href="{% url 'posts:list' %}">{% if CURRENT_LANGUAGE == 'it' %}Vai alle notizie{% else %}Open news{% endif %}</a>
+        {% else %}
+          <a class="gc-btn gc-btn-primary" href="{% url 'accounts:register' %}">{% if CURRENT_LANGUAGE == 'it' %}Registrati{% else %}Join now{% endif %}</a>
+        {% endif %}
+        <a class="gc-btn gc-btn-ghost" href="#wall">{% if CURRENT_LANGUAGE == 'it' %}Community wall{% else %}Community wall{% endif %}</a>
       </div>
     </div>
+
+    <aside class="join-box reveal" id="join">
+      <h2 class="join-title">
+        {% if CURRENT_LANGUAGE == 'it' %}
+          Unisciti in 20 secondi
+        {% else %}
+          Join in 20 seconds
+        {% endif %}
+      </h2>
+      <p class="join-desc">
+        {% if CURRENT_LANGUAGE == 'it' %}
+          Scrivi una presentazione breve: ti aiuterà a trovare persone con interessi simili.
+          Questo box è una demo locale e non modifica il backend.
+        {% else %}
+          Share a short intro to help match people with similar interests.
+          This is a local demo and does not change backend data.
+        {% endif %}
+      </p>
+
+      <div class="form-grid">
+        <input id="jName" class="input" type="text" maxlength="40" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Il tuo nome{% else %}Your name{% endif %}">
+        <input id="jTag" class="input" type="text" maxlength="24" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Interessi{% else %}Interests{% endif %}">
+        <textarea id="jMsg" class="input" maxlength="260" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Una frase su di te{% else %}One line about you{% endif %}"></textarea>
+      </div>
+
+      <div class="tag-row" aria-label="Quick tags">
+        <button class="tag-pill" type="button" data-tag="Language">Language</button>
+        <button class="tag-pill" type="button" data-tag="Coffee">Coffee</button>
+        <button class="tag-pill" type="button" data-tag="Study">Study</button>
+        <button class="tag-pill" type="button" data-tag="Sports">Sports</button>
+        <button class="tag-pill" type="button" data-tag="Gaming">Gaming</button>
+        <button class="tag-pill" type="button" data-tag="City Walks">City walks</button>
+      </div>
+
+      <div class="actions-row">
+        <button class="gc-btn gc-btn-primary" id="quickPost" type="button">{% if CURRENT_LANGUAGE == 'it' %}Pubblica{% else %}Post + join{% endif %}</button>
+        <button class="gc-btn gc-btn-ghost" id="scrollWall" type="button">{% if CURRENT_LANGUAGE == 'it' %}Vai al wall{% else %}See join wall{% endif %}</button>
+      </div>
+    </aside>
   </div>
-  {% empty %}
-  <p>{% trans "No posts yet." %}</p>
-  {% endfor %}
+
+  <div class="marquee" aria-hidden="true">
+    <div class="track">
+      <span><i class="spark"></i> CAMPUS COMMUNITY</span>
+      <span><i class="spark"></i> INTERNATIONAL STUDENTS</span>
+      <span><i class="spark"></i> VERIFIED ACCOUNTS</span>
+      <span><i class="spark"></i> NEWS & EVENTS</span>
+      <span><i class="spark"></i> MULTILINGUAL SUPPORT</span>
+
+      <span><i class="spark"></i> CAMPUS COMMUNITY</span>
+      <span><i class="spark"></i> INTERNATIONAL STUDENTS</span>
+      <span><i class="spark"></i> VERIFIED ACCOUNTS</span>
+      <span><i class="spark"></i> NEWS & EVENTS</span>
+      <span><i class="spark"></i> MULTILINGUAL SUPPORT</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="news">
+  <h2 class="headline reveal">
+    <small>{% if CURRENT_LANGUAGE == 'it' %}Ultime notizie{% else %}Latest updates{% endif %}</small>
+    {% if CURRENT_LANGUAGE == 'it' %}
+      NOVITÀ DAL<br>CAMPUS.
+    {% else %}
+      WHAT'S NEW<br>ON CAMPUS.
+    {% endif %}
+  </h2>
+
+  <p class="blurb reveal">
+    {% if CURRENT_LANGUAGE == 'it' %}
+      Le ultime comunicazioni ufficiali restano centrali: questa sezione usa gli stessi dati e la stessa logica server di prima.
+    {% else %}
+      Official communications stay central: this section uses the same data and server logic as before.
+    {% endif %}
+  </p>
+
+  <div class="news-grid">
+    {% for post in latest_posts %}
+      <article class="news-card reveal">
+        <div>
+          <h3>{% if CURRENT_LANGUAGE == 'it' %}{{ post.title_it }}{% else %}{{ post.title_en }}{% endif %}</h3>
+          <p class="mt-2">{% if CURRENT_LANGUAGE == 'it' %}Notizia pubblicata dal dipartimento.{% else %}Department news item.{% endif %}</p>
+        </div>
+        <div class="news-meta">
+          <span class="meta-pill">{{ post.published_at|date:"Y-m-d" }}</span>
+          <a class="gc-btn gc-btn-ghost" href="{% url 'posts:detail' post.slug %}">{% trans "Read" %}</a>
+        </div>
+      </article>
+    {% empty %}
+      <p>{% trans "No posts yet." %}</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="how">
+  <h2 class="headline reveal">
+    <small>{% if CURRENT_LANGUAGE == 'it' %}Come funziona{% else %}How it works{% endif %}</small>
+    {% if CURRENT_LANGUAGE == 'it' %}
+      SEMPLICE.<br>CHIARO.<br>PRATICO.
+    {% else %}
+      SIMPLE.<br>CLEAR.<br>PRACTICAL.
+    {% endif %}
+  </h2>
+
+  <div class="tiles">
+    <article class="tile reveal">
+      <div class="tile-head"><strong>{% if CURRENT_LANGUAGE == 'it' %}Leggi{% else %}Read{% endif %}</strong><span class="tile-index">01</span></div>
+      <p>{% if CURRENT_LANGUAGE == 'it' %}Aggiornamenti dipartimentali in italiano e inglese.{% else %}Department updates in Italian and English.{% endif %}</p>
+    </article>
+    <article class="tile reveal">
+      <div class="tile-head"><strong>{% if CURRENT_LANGUAGE == 'it' %}Partecipa{% else %}Participate{% endif %}</strong><span class="tile-index">02</span></div>
+      <p>{% if CURRENT_LANGUAGE == 'it' %}Gli studenti verificati possono commentare e discutere le notizie.{% else %}Verified students can comment and discuss updates.{% endif %}</p>
+    </article>
+    <article class="tile reveal">
+      <div class="tile-head"><strong>{% if CURRENT_LANGUAGE == 'it' %}Connettiti{% else %}Connect{% endif %}</strong><span class="tile-index">03</span></div>
+      <p>{% if CURRENT_LANGUAGE == 'it' %}Usa il wall locale per trovare persone con interessi simili.{% else %}Use the local wall to find people with similar interests.{% endif %}</p>
+    </article>
+  </div>
+</section>
+
+<section class="section" id="wall">
+  <h2 class="headline reveal">
+    <small>{% if CURRENT_LANGUAGE == 'it' %}Community wall{% else %}Community wall{% endif %}</small>
+    {% if CURRENT_LANGUAGE == 'it' %}
+      PRESENTATI.<br>TROVA IL TUO GRUPPO.
+    {% else %}
+      INTRO YOURSELF.<br>FIND YOUR PEOPLE.
+    {% endif %}
+  </h2>
+
+  <p class="blurb reveal">
+    {% if CURRENT_LANGUAGE == 'it' %}
+      Demo locale in `localStorage`: ideale per test UX senza cambiare il database.
+    {% else %}
+      Local `localStorage` demo: useful for UX testing without touching the database.
+    {% endif %}
+  </p>
+
+  <div class="wall">
+    <div class="panel reveal">
+      <h3>{% if CURRENT_LANGUAGE == 'it' %}Pubblica la tua intro{% else %}Post your intro{% endif %}</h3>
+      <p>{% if CURRENT_LANGUAGE == 'it' %}Messaggio breve, tag chiaro, contatto semplice.{% else %}Keep it short, add a clear tag, make it easy to connect.{% endif %}</p>
+
+      <div class="form-grid">
+        <div>
+          <p class="mini-label">{% if CURRENT_LANGUAGE == 'it' %}Nome{% else %}Name{% endif %}</p>
+          <input id="name" class="input" type="text" maxlength="40" placeholder="Alex">
+        </div>
+
+        <div class="row2">
+          <div>
+            <p class="mini-label">{% if CURRENT_LANGUAGE == 'it' %}Tag{% else %}Vibe tag{% endif %}</p>
+            <input id="topic" class="input" type="text" maxlength="24" placeholder="Coffee / Language">
+          </div>
+          <div>
+            <p class="mini-label">{% if CURRENT_LANGUAGE == 'it' %}Lingua{% else %}Language{% endif %}</p>
+            <input id="lang" class="input" type="text" maxlength="24" placeholder="EN/IT">
+          </div>
+        </div>
+
+        <div>
+          <p class="mini-label">{% if CURRENT_LANGUAGE == 'it' %}Messaggio{% else %}One-liner{% endif %}</p>
+          <textarea id="message" class="input" maxlength="800" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Nuovo in città, cerco gruppo per allenare l'italiano.{% else %}New in town, looking for people to practice Italian with.{% endif %}"></textarea>
+        </div>
+
+        <div class="actions-row">
+          <button class="gc-btn gc-btn-primary" id="publish" type="button">{% if CURRENT_LANGUAGE == 'it' %}Pubblica{% else %}Post{% endif %}</button>
+          <button class="gc-btn gc-btn-ghost" id="clearAll" type="button">{% if CURRENT_LANGUAGE == 'it' %}Pulisci{% else %}Clear local{% endif %}</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel reveal">
+      <h3>{% if CURRENT_LANGUAGE == 'it' %}Post recenti{% else %}Recent posts{% endif %}</h3>
+      <div id="posts" class="posts"></div>
+      <p id="empty" class="wall-empty">{% if CURRENT_LANGUAGE == 'it' %}Nessun post ancora. Inizia tu.{% else %}No posts yet. Be the first one.{% endif %}</p>
+    </div>
+  </div>
+</section>
+
+<div class="sticky-cta" id="stickyCTA" style="display:none;">
+  <div class="inner">
+    <div class="sticky-cta-bar">
+      <div class="sticky-cta-copy">
+        <strong>{% if CURRENT_LANGUAGE == 'it' %}Unisciti alla community{% else %}Join the community{% endif %}</strong>
+        <span>{% if CURRENT_LANGUAGE == 'it' %}20 secondi per presentarti{% else %}20 seconds to introduce yourself{% endif %}</span>
+      </div>
+      <a class="gc-btn gc-btn-primary" href="#join">{% if CURRENT_LANGUAGE == 'it' %}Vai al form{% else %}Join now{% endif %}</a>
+    </div>
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  (function () {
+    var sticky = document.getElementById('stickyCTA');
+    var join = document.getElementById('join');
+    if (sticky && join) {
+      var prefersReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduce) {
+        sticky.style.display = 'block';
+      } else {
+        var ctaObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            sticky.style.display = entry.isIntersecting ? 'none' : 'block';
+          });
+        }, { threshold: 0.45 });
+        ctaObserver.observe(join);
+      }
+    }
+
+    var tags = Array.prototype.slice.call(document.querySelectorAll('.tag-pill'));
+    var jTag = document.getElementById('jTag');
+    tags.forEach(function (tag) {
+      tag.addEventListener('click', function () {
+        tag.classList.toggle('on');
+        var selected = tags.filter(function (item) {
+          return item.classList.contains('on');
+        }).map(function (item) {
+          return item.getAttribute('data-tag');
+        });
+        if (jTag && selected.length) {
+          jTag.value = selected.join(', ');
+        }
+      });
+    });
+
+    var KEY = 'ucsc_intro_wall_v1';
+    var postsEl = document.getElementById('posts');
+    var emptyEl = document.getElementById('empty');
+
+    var nameEl = document.getElementById('name');
+    var topicEl = document.getElementById('topic');
+    var langEl = document.getElementById('lang');
+    var msgEl = document.getElementById('message');
+
+    var publishBtn = document.getElementById('publish');
+    var clearBtn = document.getElementById('clearAll');
+    var quickPostBtn = document.getElementById('quickPost');
+    var scrollWallBtn = document.getElementById('scrollWall');
+
+    var jName = document.getElementById('jName');
+    var jMsg = document.getElementById('jMsg');
+
+    function escapeHTML(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function loadPosts() {
+      try {
+        return JSON.parse(localStorage.getItem(KEY) || '[]');
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function savePosts(items) {
+      localStorage.setItem(KEY, JSON.stringify(items));
+    }
+
+    function renderPosts() {
+      if (!postsEl || !emptyEl) {
+        return;
+      }
+      var items = loadPosts().slice().sort(function (a, b) {
+        return b.ts - a.ts;
+      });
+      postsEl.innerHTML = '';
+      emptyEl.style.display = items.length ? 'none' : 'block';
+
+      items.forEach(function (item) {
+        var wrap = document.createElement('article');
+        wrap.className = 'wall-post';
+
+        var dt = new Date(item.ts);
+        var time = dt.toLocaleString(undefined, {
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        var tagHtml = item.topic ? '<span class="meta-pill">#' + escapeHTML(item.topic) + '</span>' : '';
+        var langHtml = item.lang ? '<span class="meta-pill">' + escapeHTML(item.lang) + '</span>' : '';
+
+        wrap.innerHTML =
+          '<div class="wall-post-meta">' +
+            '<span class="wall-post-name">' + escapeHTML(item.name) + '</span>' +
+            tagHtml +
+            langHtml +
+            '<span class="wall-post-time">' + escapeHTML(time) + '</span>' +
+          '</div>' +
+          '<div>' + escapeHTML(item.message) + '</div>';
+
+        postsEl.appendChild(wrap);
+      });
+    }
+
+    function postMessage(name, topic, lang, message) {
+      var cleanName = (name || '').trim();
+      var cleanTopic = (topic || '').trim();
+      var cleanLang = (lang || '').trim();
+      var cleanMessage = (message || '').trim();
+
+      if (!cleanName || !cleanMessage) {
+        return;
+      }
+
+      var items = loadPosts();
+      items.push({
+        name: cleanName.slice(0, 40),
+        topic: cleanTopic.slice(0, 24),
+        lang: cleanLang.slice(0, 24),
+        message: cleanMessage.slice(0, 800),
+        ts: Date.now()
+      });
+      savePosts(items);
+      renderPosts();
+    }
+
+    if (publishBtn) {
+      publishBtn.addEventListener('click', function () {
+        postMessage(nameEl && nameEl.value, topicEl && topicEl.value, langEl && langEl.value, msgEl && msgEl.value);
+        if (nameEl) nameEl.value = '';
+        if (topicEl) topicEl.value = '';
+        if (langEl) langEl.value = '';
+        if (msgEl) msgEl.value = '';
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        localStorage.removeItem(KEY);
+        renderPosts();
+      });
+    }
+
+    if (quickPostBtn) {
+      quickPostBtn.addEventListener('click', function () {
+        postMessage(
+          jName && jName.value ? jName.value : 'Anonymous',
+          jTag && jTag.value ? jTag.value : '',
+          '',
+          jMsg && jMsg.value ? jMsg.value : 'Joining the community.'
+        );
+        if (jName) jName.value = '';
+        if (jTag) jTag.value = '';
+        if (jMsg) jMsg.value = '';
+
+        var wallSection = document.getElementById('wall');
+        if (wallSection) {
+          wallSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+
+    if (scrollWallBtn) {
+      scrollWallBtn.addEventListener('click', function () {
+        var wallSection = document.getElementById('wall');
+        if (wallSection) {
+          wallSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+
+    renderPosts();
+  })();
+</script>
 {% endblock %}

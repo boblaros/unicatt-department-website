@@ -51,7 +51,7 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('email', 'full_name')
 
     def _can_manage(self, request):
-        return request.user.is_superuser or request.user.is_moderator
+        return bool(getattr(request.user, 'is_superuser', False) or getattr(request.user, 'is_moderator', False))
 
     def has_module_permission(self, request):
         return self._can_manage(request)
@@ -66,7 +66,7 @@ class UserAdmin(BaseUserAdmin):
         return self._can_manage(request)
 
     def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
+        return bool(getattr(request.user, 'is_superuser', False))
 
 
 @admin.register(RateLimitRecord)
@@ -75,4 +75,4 @@ class RateLimitRecordAdmin(admin.ModelAdmin):
     search_fields = ('action', 'key')
 
     def has_module_permission(self, request):
-        return request.user.is_superuser
+        return bool(getattr(request.user, 'is_superuser', False))

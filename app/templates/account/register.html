@@ -1,16 +1,35 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% block title %}{% trans "Register" %}{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-8 col-lg-6">
-    <h1 class="h3 mb-3">{% trans "Student Registration" %}</h1>
-    <p>{% trans "Only @unicatt.it and @icatt.it emails can register." %}</p>
-    <form method="post" class="card p-3">
+{% get_current_language as CURRENT_LANGUAGE %}
+<section class="section pt-0">
+  <div class="auth-grid" style="max-width: 760px;">
+    <h1 class="auth-title reveal">{% if CURRENT_LANGUAGE == 'it' %}Registrazione studenti{% else %}Student registration{% endif %}</h1>
+    <p class="auth-lead reveal">{% trans "Only @unicatt.it and @icatt.it emails can register." %}</p>
+
+    <form method="post" class="panel form-shell reveal">
       {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit" class="btn btn-primary">{% trans "Register" %}</button>
+
+      {% if form.non_field_errors %}
+        <div class="form-error">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      {% for field in form %}
+        <div class="field-row">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+          {% for error in field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        </div>
+      {% endfor %}
+
+      <div class="actions-row">
+        <button type="submit" class="gc-btn gc-btn-primary">{% trans "Register" %}</button>
+        <a class="gc-btn gc-btn-ghost" href="{% url 'accounts:login' %}">{% if CURRENT_LANGUAGE == 'it' %}Hai già un account?{% else %}Already have an account?{% endif %}</a>
+      </div>
     </form>
   </div>
-</div>
+</section>
 {% endblock %}

@@ -18,7 +18,7 @@ class PostAdmin(admin.ModelAdmin):
     inlines = [PostImageInline]
 
     def _can_manage(self, request):
-        return request.user.is_superuser or request.user.is_moderator
+        return bool(getattr(request.user, 'is_superuser', False) or getattr(request.user, 'is_moderator', False))
 
     def has_module_permission(self, request):
         return self._can_manage(request)
@@ -46,7 +46,7 @@ class PostImageAdmin(admin.ModelAdmin):
     list_display = ('post', 'created_at')
 
     def _can_manage(self, request):
-        return request.user.is_superuser or request.user.is_moderator
+        return bool(getattr(request.user, 'is_superuser', False) or getattr(request.user, 'is_moderator', False))
 
     def has_module_permission(self, request):
         return self._can_manage(request)

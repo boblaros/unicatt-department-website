@@ -16,11 +16,6 @@ class PostListView(ListView):
     def get_queryset(self):
         return Post.objects.published()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['content_lang'] = self.request.GET.get('content_lang', 'en') if self.request.GET.get('content_lang') in {'en', 'it'} else 'en'
-        return context
-
 
 def _comment_tree(post):
     comments = Comment.objects.filter(post=post, parent__isnull=True).select_related('author')
@@ -30,11 +25,9 @@ def _comment_tree(post):
 def post_detail_view(request, slug):
     post = get_object_or_404(Post.objects.published(), slug=slug)
     comment_form = CommentCreateForm()
-    content_lang = request.GET.get('content_lang', 'en') if request.GET.get('content_lang') in {'en', 'it'} else 'en'
     context = {
         'post': post,
         'comment_form': comment_form,
         'comments': _comment_tree(post),
-        'content_lang': content_lang,
     }
     return render(request, 'posts/post_detail.html', context)
