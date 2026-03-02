@@ -18,7 +18,25 @@
 
       {% for field in form %}
         <div class="field-row">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          <label for="{{ field.id_for_label }}">
+            {% if CURRENT_LANGUAGE == 'it' %}
+              {% if field.name == 'email' %}
+                Indirizzo email
+              {% elif field.name == 'full_name' %}
+                Nome completo
+              {% elif field.name == 'study_program' %}
+                Corso di studi
+              {% elif field.name == 'year_of_study' %}
+                Anno di corso
+              {% elif field.name == 'country_of_origin' %}
+                Paese di provenienza
+              {% else %}
+                {{ field.label }}
+              {% endif %}
+            {% else %}
+              {{ field.label }}
+            {% endif %}
+          </label>
           {{ field }}
           {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
           {% for error in field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}

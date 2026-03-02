@@ -379,26 +379,41 @@ a {
   gap: 10px;
 }
 
+.form-shell {
+  display: grid;
+  gap: 14px;
+}
+
 .form-shell p,
 .field-row {
   margin: 0;
-  display: grid;
-  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
 }
 
 .form-shell p + p {
-  margin-top: 10px;
+  margin-top: 0;
+}
+
+.field-row + .field-row {
+  margin-top: 0;
 }
 
 .form-shell label,
 .field-row label,
 .mini-label {
+  display: block;
   margin: 0;
+  padding: 0;
+  align-self: flex-start;
   color: rgba(71, 85, 105, 0.95);
   font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .form-shell input,
@@ -406,13 +421,17 @@ a {
 .form-shell select,
 .input-control,
 .input {
+  display: block;
   width: 100%;
+  margin: 0;
+  min-height: 48px;
   border-radius: 16px;
   border: 1px solid rgba(15, 23, 42, 0.14);
   background: rgba(255, 255, 255, 0.93);
   color: rgba(11, 18, 32, 0.95);
   padding: 12px 14px;
   font-size: 15px;
+  line-height: 1.2;
   outline: none;
   transition: box-shadow .18s var(--ease), border-color .18s var(--ease);
 }
@@ -422,7 +441,15 @@ a {
 textarea.input-control,
 textarea.input {
   min-height: 120px;
+  line-height: 1.45;
   resize: vertical;
+}
+
+.form-shell small {
+  margin: 0;
+  color: rgba(71, 85, 105, 0.95);
+  font-size: 12px;
+  line-height: 1.3;
 }
 
 .form-shell input:focus,
@@ -490,6 +517,10 @@ textarea.input {
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 10px;
+}
+
+.form-shell .actions-row {
+  margin-top: 2px;
 }
 
 .marquee {

@@ -18,7 +18,19 @@
 
       {% for field in form %}
         <div class="field-row">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          <label for="{{ field.id_for_label }}">
+            {% if CURRENT_LANGUAGE == 'it' %}
+              {% if field.name == 'email' %}
+                Indirizzo email
+              {% elif field.name == 'password' %}
+                Password
+              {% else %}
+                {{ field.label }}
+              {% endif %}
+            {% else %}
+              {{ field.label }}
+            {% endif %}
+          </label>
           {{ field }}
           {% for error in field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
         </div>
