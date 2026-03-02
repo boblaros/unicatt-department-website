@@ -6,7 +6,7 @@
 {% get_current_language as CURRENT_LANGUAGE %}
 
 <section class="hero-section">
-  <div class="hero-grid">
+  <div class="hero-grid {% if request.user.is_authenticated %}hero-grid-full{% endif %}">
     <div class="reveal">
       <div class="kicker"><span class="pulse"></span>
         {% if CURRENT_LANGUAGE == 'it' %}
@@ -35,7 +35,11 @@
       </p>
 
       <p class="microcopy">
-        {% if CURRENT_LANGUAGE == 'it' %}
+        {% if request.user.is_authenticated and CURRENT_LANGUAGE == 'it' %}
+          Ora puoi usare direttamente le funzioni community: commenti alle notizie e messaggi pubblici sulla wall del dipartimento.
+        {% elif request.user.is_authenticated %}
+          You can now use the community features directly: comments on news and public messages on the department wall.
+        {% elif CURRENT_LANGUAGE == 'it' %}
           La piattaforma resta con la logica attuale: area notizie, autenticazione studenti verificati e commenti moderati.
         {% else %}
           The platform keeps the current logic: news area, verified student authentication, and moderated comments.
@@ -52,44 +56,66 @@
       </div>
     </div>
 
+    {% if not request.user.is_authenticated %}
     <aside class="join-box reveal" id="join">
       <h2 class="join-title">
         {% if CURRENT_LANGUAGE == 'it' %}
-          Unisciti in 20 secondi
+          Unisciti in 30 secondi
         {% else %}
-          Join in 20 seconds
+          Join in 30 seconds
         {% endif %}
       </h2>
       <p class="join-desc">
         {% if CURRENT_LANGUAGE == 'it' %}
-          Scrivi una presentazione breve: ti aiuterà a trovare persone con interessi simili.
-          Questo box è una demo locale e non modifica il backend.
+          Registrazione rapida con email universitaria. Sono ammessi solo indirizzi `@unicatt.it` o `@icatt.it`.
+          Dopo la registrazione ricevi la password via email.
         {% else %}
-          Share a short intro to help match people with similar interests.
-          This is a local demo and does not change backend data.
+          Quick registration using university email. Only `@unicatt.it` or `@icatt.it` addresses are allowed.
+          After signup, your password is sent by email.
         {% endif %}
       </p>
 
-      <div class="form-grid">
-        <input id="jName" class="input" type="text" maxlength="40" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Il tuo nome{% else %}Your name{% endif %}">
-        <input id="jTag" class="input" type="text" maxlength="24" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Interessi{% else %}Interests{% endif %}">
-        <textarea id="jMsg" class="input" maxlength="260" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Una frase su di te{% else %}One line about you{% endif %}"></textarea>
-      </div>
-
-      <div class="tag-row" aria-label="Quick tags">
-        <button class="tag-pill" type="button" data-tag="Language">Language</button>
-        <button class="tag-pill" type="button" data-tag="Coffee">Coffee</button>
-        <button class="tag-pill" type="button" data-tag="Study">Study</button>
-        <button class="tag-pill" type="button" data-tag="Sports">Sports</button>
-        <button class="tag-pill" type="button" data-tag="Gaming">Gaming</button>
-        <button class="tag-pill" type="button" data-tag="City Walks">City walks</button>
-      </div>
-
-      <div class="actions-row">
-        <button class="gc-btn gc-btn-primary" id="quickPost" type="button">{% if CURRENT_LANGUAGE == 'it' %}Pubblica{% else %}Post + join{% endif %}</button>
-        <button class="gc-btn gc-btn-ghost" id="scrollWall" type="button">{% if CURRENT_LANGUAGE == 'it' %}Vai al wall{% else %}See join wall{% endif %}</button>
-      </div>
+      <form method="post" action="{% url 'accounts:register' %}" class="form-shell">
+        {% csrf_token %}
+        <div class="field-row">
+          <label for="{{ quick_register_form.email.id_for_label }}">
+            {% if CURRENT_LANGUAGE == 'it' %}Indirizzo email{% else %}Email address{% endif %}
+          </label>
+          {{ quick_register_form.email }}
+        </div>
+        <div class="field-row">
+          <label for="{{ quick_register_form.full_name.id_for_label }}">
+            {% if CURRENT_LANGUAGE == 'it' %}Nome completo{% else %}Full name{% endif %}
+          </label>
+          {{ quick_register_form.full_name }}
+        </div>
+        <div class="row2">
+          <div class="field-row">
+            <label for="{{ quick_register_form.study_program.id_for_label }}">
+              {% if CURRENT_LANGUAGE == 'it' %}Corso di studi{% else %}Study program{% endif %}
+            </label>
+            {{ quick_register_form.study_program }}
+          </div>
+          <div class="field-row">
+            <label for="{{ quick_register_form.year_of_study.id_for_label }}">
+              {% if CURRENT_LANGUAGE == 'it' %}Anno di corso{% else %}Year of study{% endif %}
+            </label>
+            {{ quick_register_form.year_of_study }}
+          </div>
+        </div>
+        <div class="field-row">
+          <label for="{{ quick_register_form.country_of_origin.id_for_label }}">
+            {% if CURRENT_LANGUAGE == 'it' %}Paese di provenienza{% else %}Country of origin{% endif %}
+          </label>
+          {{ quick_register_form.country_of_origin }}
+        </div>
+        <div class="actions-row">
+          <button class="gc-btn gc-btn-primary" type="submit">{% if CURRENT_LANGUAGE == 'it' %}Registrati{% else %}Register{% endif %}</button>
+          <a class="gc-btn gc-btn-ghost" href="#wall">{% if CURRENT_LANGUAGE == 'it' %}Vai al wall{% else %}See join wall{% endif %}</a>
+        </div>
+      </form>
     </aside>
+    {% endif %}
   </div>
 
   <div class="marquee" aria-hidden="true">
@@ -166,7 +192,7 @@
     </article>
     <article class="tile reveal">
       <div class="tile-head"><strong>{% if CURRENT_LANGUAGE == 'it' %}Connettiti{% else %}Connect{% endif %}</strong><span class="tile-index">03</span></div>
-      <p>{% if CURRENT_LANGUAGE == 'it' %}Usa il wall locale per trovare persone con interessi simili.{% else %}Use the local wall to find people with similar interests.{% endif %}</p>
+      <p>{% if CURRENT_LANGUAGE == 'it' %}Usa la wall pubblica per trovare persone con interessi simili.{% else %}Use the public wall to find people with similar interests.{% endif %}</p>
     </article>
   </div>
 </section>
@@ -183,247 +209,53 @@
 
   <p class="blurb reveal">
     {% if CURRENT_LANGUAGE == 'it' %}
-      Demo locale in `localStorage`: ideale per test UX senza cambiare il database.
+      Bacheca pubblica del dipartimento per messaggi brevi tra studenti.
     {% else %}
-      Local `localStorage` demo: useful for UX testing without touching the database.
+      Public department wall for short student messages.
     {% endif %}
   </p>
 
   <div class="wall">
     <div class="panel reveal">
       <h3>{% if CURRENT_LANGUAGE == 'it' %}Pubblica la tua intro{% else %}Post your intro{% endif %}</h3>
-      <p>{% if CURRENT_LANGUAGE == 'it' %}Messaggio breve, tag chiaro, contatto semplice.{% else %}Keep it short, add a clear tag, make it easy to connect.{% endif %}</p>
-
-      <div class="form-grid">
-        <div>
-          <p class="mini-label">{% if CURRENT_LANGUAGE == 'it' %}Nome{% else %}Name{% endif %}</p>
-          <input id="name" class="input" type="text" maxlength="40" placeholder="Alex">
+      {% if request.user.is_authenticated %}
+      <p>{% if CURRENT_LANGUAGE == 'it' %}Scrivi un messaggio breve sulla wall comune.{% else %}Write a short message to the shared wall.{% endif %}</p>
+      <form method="post" action="{% url 'core:create_wall_post' %}" class="form-shell">
+        {% csrf_token %}
+        <div class="field-row">
+          <label for="id_body">{% if CURRENT_LANGUAGE == 'it' %}Messaggio{% else %}Message{% endif %}</label>
+          <textarea id="id_body" name="body" rows="4" maxlength="800" required class="input-control" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Scrivi il tuo messaggio alla community...{% else %}Write your message to the community...{% endif %}"></textarea>
         </div>
-
-        <div class="row2">
-          <div>
-            <p class="mini-label">{% if CURRENT_LANGUAGE == 'it' %}Tag{% else %}Vibe tag{% endif %}</p>
-            <input id="topic" class="input" type="text" maxlength="24" placeholder="Coffee / Language">
-          </div>
-          <div>
-            <p class="mini-label">{% if CURRENT_LANGUAGE == 'it' %}Lingua{% else %}Language{% endif %}</p>
-            <input id="lang" class="input" type="text" maxlength="24" placeholder="EN/IT">
-          </div>
-        </div>
-
-        <div>
-          <p class="mini-label">{% if CURRENT_LANGUAGE == 'it' %}Messaggio{% else %}One-liner{% endif %}</p>
-          <textarea id="message" class="input" maxlength="800" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Nuovo in città, cerco gruppo per allenare l'italiano.{% else %}New in town, looking for people to practice Italian with.{% endif %}"></textarea>
-        </div>
-
         <div class="actions-row">
-          <button class="gc-btn gc-btn-primary" id="publish" type="button">{% if CURRENT_LANGUAGE == 'it' %}Pubblica{% else %}Post{% endif %}</button>
-          <button class="gc-btn gc-btn-ghost" id="clearAll" type="button">{% if CURRENT_LANGUAGE == 'it' %}Pulisci{% else %}Clear local{% endif %}</button>
+          <button class="gc-btn gc-btn-primary" type="submit">{% if CURRENT_LANGUAGE == 'it' %}Pubblica{% else %}Post{% endif %}</button>
         </div>
+      </form>
+      {% else %}
+      <p>{% if CURRENT_LANGUAGE == 'it' %}Per pubblicare sulla wall devi prima accedere o registrarti.{% else %}To post on the wall, please login or register first.{% endif %}</p>
+      <div class="actions-row">
+        <a class="gc-btn gc-btn-primary" href="{% url 'accounts:register' %}">{% if CURRENT_LANGUAGE == 'it' %}Registrati{% else %}Register{% endif %}</a>
+        <a class="gc-btn gc-btn-ghost" href="{% url 'accounts:login' %}">{% if CURRENT_LANGUAGE == 'it' %}Accedi{% else %}Login{% endif %}</a>
       </div>
+      {% endif %}
     </div>
 
     <div class="panel reveal">
       <h3>{% if CURRENT_LANGUAGE == 'it' %}Post recenti{% else %}Recent posts{% endif %}</h3>
-      <div id="posts" class="posts"></div>
-      <p id="empty" class="wall-empty">{% if CURRENT_LANGUAGE == 'it' %}Nessun post ancora. Inizia tu.{% else %}No posts yet. Be the first one.{% endif %}</p>
+      <div class="posts">
+        {% for wall_post in wall_posts %}
+          <article class="wall-post">
+            <div class="wall-post-meta">
+              <span class="wall-post-name">{{ wall_post.author.full_name|default:wall_post.author.email }}</span>
+              <span class="meta-pill">{{ wall_post.created_at|date:"Y-m-d H:i" }}</span>
+            </div>
+            <div class="comment-text">{{ wall_post.body|linebreaksbr }}</div>
+          </article>
+        {% empty %}
+          <p class="wall-empty">{% if CURRENT_LANGUAGE == 'it' %}Nessun post ancora. Inizia tu.{% else %}No posts yet. Be the first one.{% endif %}</p>
+        {% endfor %}
+      </div>
     </div>
   </div>
 </section>
 
-<div class="sticky-cta" id="stickyCTA" style="display:none;">
-  <div class="inner">
-    <div class="sticky-cta-bar">
-      <div class="sticky-cta-copy">
-        <strong>{% if CURRENT_LANGUAGE == 'it' %}Unisciti alla community{% else %}Join the community{% endif %}</strong>
-        <span>{% if CURRENT_LANGUAGE == 'it' %}20 secondi per presentarti{% else %}20 seconds to introduce yourself{% endif %}</span>
-      </div>
-      <a class="gc-btn gc-btn-primary" href="#join">{% if CURRENT_LANGUAGE == 'it' %}Vai al form{% else %}Join now{% endif %}</a>
-    </div>
-  </div>
-</div>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-  (function () {
-    var sticky = document.getElementById('stickyCTA');
-    var join = document.getElementById('join');
-    if (sticky && join) {
-      var prefersReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (prefersReduce) {
-        sticky.style.display = 'block';
-      } else {
-        var ctaObserver = new IntersectionObserver(function (entries) {
-          entries.forEach(function (entry) {
-            sticky.style.display = entry.isIntersecting ? 'none' : 'block';
-          });
-        }, { threshold: 0.45 });
-        ctaObserver.observe(join);
-      }
-    }
-
-    var tags = Array.prototype.slice.call(document.querySelectorAll('.tag-pill'));
-    var jTag = document.getElementById('jTag');
-    tags.forEach(function (tag) {
-      tag.addEventListener('click', function () {
-        tag.classList.toggle('on');
-        var selected = tags.filter(function (item) {
-          return item.classList.contains('on');
-        }).map(function (item) {
-          return item.getAttribute('data-tag');
-        });
-        if (jTag && selected.length) {
-          jTag.value = selected.join(', ');
-        }
-      });
-    });
-
-    var KEY = 'ucsc_intro_wall_v1';
-    var postsEl = document.getElementById('posts');
-    var emptyEl = document.getElementById('empty');
-
-    var nameEl = document.getElementById('name');
-    var topicEl = document.getElementById('topic');
-    var langEl = document.getElementById('lang');
-    var msgEl = document.getElementById('message');
-
-    var publishBtn = document.getElementById('publish');
-    var clearBtn = document.getElementById('clearAll');
-    var quickPostBtn = document.getElementById('quickPost');
-    var scrollWallBtn = document.getElementById('scrollWall');
-
-    var jName = document.getElementById('jName');
-    var jMsg = document.getElementById('jMsg');
-
-    function escapeHTML(value) {
-      return String(value)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
-
-    function loadPosts() {
-      try {
-        return JSON.parse(localStorage.getItem(KEY) || '[]');
-      } catch (error) {
-        return [];
-      }
-    }
-
-    function savePosts(items) {
-      localStorage.setItem(KEY, JSON.stringify(items));
-    }
-
-    function renderPosts() {
-      if (!postsEl || !emptyEl) {
-        return;
-      }
-      var items = loadPosts().slice().sort(function (a, b) {
-        return b.ts - a.ts;
-      });
-      postsEl.innerHTML = '';
-      emptyEl.style.display = items.length ? 'none' : 'block';
-
-      items.forEach(function (item) {
-        var wrap = document.createElement('article');
-        wrap.className = 'wall-post';
-
-        var dt = new Date(item.ts);
-        var time = dt.toLocaleString(undefined, {
-          year: 'numeric',
-          month: 'short',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-
-        var tagHtml = item.topic ? '<span class="meta-pill">#' + escapeHTML(item.topic) + '</span>' : '';
-        var langHtml = item.lang ? '<span class="meta-pill">' + escapeHTML(item.lang) + '</span>' : '';
-
-        wrap.innerHTML =
-          '<div class="wall-post-meta">' +
-            '<span class="wall-post-name">' + escapeHTML(item.name) + '</span>' +
-            tagHtml +
-            langHtml +
-            '<span class="wall-post-time">' + escapeHTML(time) + '</span>' +
-          '</div>' +
-          '<div>' + escapeHTML(item.message) + '</div>';
-
-        postsEl.appendChild(wrap);
-      });
-    }
-
-    function postMessage(name, topic, lang, message) {
-      var cleanName = (name || '').trim();
-      var cleanTopic = (topic || '').trim();
-      var cleanLang = (lang || '').trim();
-      var cleanMessage = (message || '').trim();
-
-      if (!cleanName || !cleanMessage) {
-        return;
-      }
-
-      var items = loadPosts();
-      items.push({
-        name: cleanName.slice(0, 40),
-        topic: cleanTopic.slice(0, 24),
-        lang: cleanLang.slice(0, 24),
-        message: cleanMessage.slice(0, 800),
-        ts: Date.now()
-      });
-      savePosts(items);
-      renderPosts();
-    }
-
-    if (publishBtn) {
-      publishBtn.addEventListener('click', function () {
-        postMessage(nameEl && nameEl.value, topicEl && topicEl.value, langEl && langEl.value, msgEl && msgEl.value);
-        if (nameEl) nameEl.value = '';
-        if (topicEl) topicEl.value = '';
-        if (langEl) langEl.value = '';
-        if (msgEl) msgEl.value = '';
-      });
-    }
-
-    if (clearBtn) {
-      clearBtn.addEventListener('click', function () {
-        localStorage.removeItem(KEY);
-        renderPosts();
-      });
-    }
-
-    if (quickPostBtn) {
-      quickPostBtn.addEventListener('click', function () {
-        postMessage(
-          jName && jName.value ? jName.value : 'Anonymous',
-          jTag && jTag.value ? jTag.value : '',
-          '',
-          jMsg && jMsg.value ? jMsg.value : 'Joining the community.'
-        );
-        if (jName) jName.value = '';
-        if (jTag) jTag.value = '';
-        if (jMsg) jMsg.value = '';
-
-        var wallSection = document.getElementById('wall');
-        if (wallSection) {
-          wallSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    }
-
-    if (scrollWallBtn) {
-      scrollWallBtn.addEventListener('click', function () {
-        var wallSection = document.getElementById('wall');
-        if (wallSection) {
-          wallSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    }
-
-    renderPosts();
-  })();
-</script>
 {% endblock %}

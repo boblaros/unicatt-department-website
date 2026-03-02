@@ -229,6 +229,14 @@ a {
   align-items: start;
 }
 
+.hero-grid.hero-grid-full {
+  grid-template-columns: 1fr;
+}
+
+.hero-grid.hero-grid-full > .reveal {
+  max-width: 980px;
+}
+
 .kicker {
   display: inline-flex;
   align-items: center;
