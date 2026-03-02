@@ -1,0 +1,15 @@
+body {
+  background: linear-gradient(180deg, #f4f7fb 0%, #ffffff 60%);
+}
+
+.hero {
+  background: linear-gradient(135deg, #d9ecff, #f5f7ff);
+}
+
+.post-body p {
+  line-height: 1.7;
+}
+
+.comment-item {
+  background: #fff;
+}

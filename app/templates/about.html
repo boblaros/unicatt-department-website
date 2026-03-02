@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}About{% endblock %}
+{% block content %}
+{% if LANGUAGE_CODE == 'it' %}
+<h1>Dipartimento Integrazione Studenti Internazionali</h1>
+<p>Questo dipartimento supporta gli studenti internazionali con orientamento, attività interculturali e comunicazioni accademiche.</p>
+{% else %}
+<h1>International Student Integration Department</h1>
+<p>This department supports international students with orientation, intercultural initiatives, and academic communications.</p>
+{% endif %}
+{% endblock %}

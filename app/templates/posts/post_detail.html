@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{{ post.title_en }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <a href="{% url 'posts:list' %}?content_lang={{ content_lang }}" class="btn btn-outline-secondary btn-sm">{% trans "Back to News" %}</a>
+  <div class="btn-group btn-group-sm">
+    <a class="btn btn-outline-primary {% if content_lang == 'en' %}active{% endif %}" href="?content_lang=en">EN</a>
+    <a class="btn btn-outline-primary {% if content_lang == 'it' %}active{% endif %}" href="?content_lang=it">IT</a>
+  </div>
+</div>
+
+<article class="mb-4">
+  <h1>{% if content_lang == 'it' %}{{ post.title_it }}{% else %}{{ post.title_en }}{% endif %}</h1>
+  <p class="text-muted">{{ post.published_at|date:"Y-m-d H:i" }}</p>
+  <div class="post-body">{% if content_lang == 'it' %}{{ post.body_it|linebreaks }}{% else %}{{ post.body_en|linebreaks }}{% endif %}</div>
+</article>
+
+{% if post.images.all %}
+<section class="mb-4">
+  <h2 class="h4">{% trans "Gallery" %}</h2>
+  <div class="row g-3">
+    {% for image in post.images.all %}
+    <div class="col-6 col-md-4">
+      <a href="{{ image.image.url }}" target="_blank" rel="noopener">
+        {% if image.thumbnail %}
+        <img class="img-fluid rounded" src="{{ image.thumbnail.url }}" alt="{{ image.caption|default:post.title_en }}">
+        {% else %}
+        <img class="img-fluid rounded" src="{{ image.image.url }}" alt="{{ image.caption|default:post.title_en }}">
+        {% endif %}
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section>
+  <h2 class="h4">{% trans "Comments" %}</h2>
+
+  {% if request.user.is_authenticated and request.user.is_verified_student and not request.user.is_banned %}
+    <form method="post" action="{% url 'comments:create' post.slug %}" class="card p-3 mb-3">
+      {% csrf_token %}
+      {{ comment_form.as_p }}
+      <button class="btn btn-primary" type="submit">{% trans "Post comment" %}</button>
+    </form>
+  {% elif request.user.is_authenticated and request.user.is_banned %}
+    <p class="text-danger">{% trans "You are banned and cannot comment." %}</p>
+  {% else %}
+    <p>{% trans "Login as a verified student to comment." %}</p>
+  {% endif %}
+
+  <div>
+    {% for comment in comments %}
+      {% include 'comments/comment_item.html' with comment=comment depth=1 %}
+    {% empty %}
+      <p>{% trans "No comments yet." %}</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

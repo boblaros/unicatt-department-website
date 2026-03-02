@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Home" %} - UCSC Integration{% endblock %}
+{% block content %}
+<section class="p-4 p-md-5 rounded-4 hero mb-4">
+  <h1 class="display-6">{% trans "International Student Integration" %}</h1>
+  <p class="lead mb-0">{% trans "Welcome to the department website of Università Cattolica del Sacro Cuore." %}</p>
+</section>
+
+<h2 class="h4 mb-3">{% trans "Latest News" %}</h2>
+<div class="row g-3">
+  {% for post in latest_posts %}
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h3 class="h6">{{ post.title_en }}</h3>
+        <p class="small text-muted">{{ post.published_at|date:"Y-m-d" }}</p>
+        <a href="{% url 'posts:detail' post.slug %}" class="btn btn-primary btn-sm">{% trans "Read" %}</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p>{% trans "No posts yet." %}</p>
+  {% endfor %}
+</div>
+{% endblock %}
