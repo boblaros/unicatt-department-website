@@ -5,31 +5,94 @@
 {% block content %}
 {% get_current_language as CURRENT_LANGUAGE %}
 <section class="section pt-0">
-  <div class="panel reveal">
-    <h1 class="headline" style="margin-bottom:14px;">
-      <small>{% if CURRENT_LANGUAGE == 'it' %}Dipartimento{% else %}Department{% endif %}</small>
+  <div class="panel reveal about-project-panel">
+    <h1 class="headline headline-strong about-headline">
+      <small>{% if CURRENT_LANGUAGE == 'it' %}Il progetto{% else %}About the project{% endif %}</small>
       {% if CURRENT_LANGUAGE == 'it' %}
-        INTEGRAZIONE<br>STUDENTI.
+        GLOCAL<br>CONNECTIONS.
       {% else %}
-        STUDENT<br>INTEGRATION.
+        GLOCAL<br>CONNECTIONS.
       {% endif %}
     </h1>
+    <img class="about-project-logo" src="/static/img/logo-unicatt.svg" alt="Università Cattolica del Sacro Cuore">
 
     {% if CURRENT_LANGUAGE == 'it' %}
-      <p class="blurb">Supportiamo studenti internazionali con orientamento, iniziative interculturali e comunicazione accademica.</p>
-      <div class="tiles">
-        <article class="tile"><div class="tile-head"><strong>Orientamento</strong><span class="tile-index">01</span></div><p>Supporto pratico per l'inserimento nel campus e nei servizi universitari.</p></article>
-        <article class="tile"><div class="tile-head"><strong>Comunità</strong><span class="tile-index">02</span></div><p>Attività per creare connessioni tra studenti locali e internazionali.</p></article>
-        <article class="tile"><div class="tile-head"><strong>Comunicazioni</strong><span class="tile-index">03</span></div><p>Notizie ufficiali e aggiornamenti rilevanti in piattaforma.</p></article>
-      </div>
+      <p class="blurb">
+        Benvenuti alla terza edizione di Glocal Connections, un progetto di peer mentoring interculturale che coinvolge studenti locali e internazionali.
+      </p>
+      <p class="about-copy">
+        L'obiettivo e rafforzare il dialogo tra studenti, supportare l'adattamento degli studenti internazionali nella nuova realta di studio e di vita,
+        e offrire a tutti i partecipanti un'esperienza interculturale concreta.
+      </p>
+      <p class="about-copy">
+        Lo definiamo bilingue italiano-inglese, ma in pratica e multilingue: nelle edizioni precedenti gli studenti hanno comunicato anche in russo,
+        francese, spagnolo, tedesco e cinese.
+      </p>
     {% else %}
-      <p class="blurb">We support international students with orientation, intercultural initiatives, and academic communication.</p>
-      <div class="tiles">
-        <article class="tile"><div class="tile-head"><strong>Orientation</strong><span class="tile-index">01</span></div><p>Practical onboarding support for campus life and university services.</p></article>
-        <article class="tile"><div class="tile-head"><strong>Community</strong><span class="tile-index">02</span></div><p>Activities to connect local and international students.</p></article>
-        <article class="tile"><div class="tile-head"><strong>Communication</strong><span class="tile-index">03</span></div><p>Official updates and relevant department information.</p></article>
-      </div>
+      <p class="blurb">
+        Welcome to the third edition of Glocal Connections, an intercultural peer mentoring project with local and international students.
+      </p>
+      <p class="about-copy">
+        The project increases dialogue among students, supports international students as they adapt to living and learning in a new home,
+        and offers an intercultural experience for everyone involved.
+      </p>
+      <p class="about-copy">
+        We call it bilingual Italian-English, but in practice it is multilingual: students in past editions have also communicated in Russian,
+        French, Spanish, German, and Chinese.
+      </p>
     {% endif %}
+
+    <div class="tiles about-tiles">
+      <article class="tile reveal">
+        <div class="tile-head"><strong>{% if CURRENT_LANGUAGE == 'it' %}Dialogo interculturale{% else %}Intercultural dialogue{% endif %}</strong><span class="tile-index">01</span></div>
+        <p>{% if CURRENT_LANGUAGE == 'it' %}Piccoli gruppi e confronto continuo tra prospettive locali e internazionali.{% else %}Small-group peer exchange that connects local and international perspectives.{% endif %}</p>
+      </article>
+      <article class="tile reveal">
+        <div class="tile-head"><strong>{% if CURRENT_LANGUAGE == 'it' %}Adattamento guidato{% else %}Adaptation support{% endif %}</strong><span class="tile-index">02</span></div>
+        <p>{% if CURRENT_LANGUAGE == 'it' %}Supporto pratico per orientarsi in servizi, studio e vita quotidiana nel nuovo contesto universitario.{% else %}Practical support to navigate services, study routines, and daily campus life in a new context.{% endif %}</p>
+      </article>
+      <article class="tile reveal">
+        <div class="tile-head"><strong>{% if CURRENT_LANGUAGE == 'it' %}Dimensione multilingue{% else %}Multilingual practice{% endif %}</strong><span class="tile-index">03</span></div>
+        <p>{% if CURRENT_LANGUAGE == 'it' %}Italiano e inglese come base, con spazio reale per piu lingue nella comunicazione tra pari.{% else %}Italian and English as a base, with real space for additional languages in peer communication.{% endif %}</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section pt-0">
+  <div class="panel reveal">
+    <h2>{% if CURRENT_LANGUAGE == 'it' %}Prospettiva del Consiglio d'Europa{% else %}Council of Europe Perspective{% endif %}</h2>
+
+    {% if CURRENT_LANGUAGE == 'it' %}
+      <p class="about-copy">
+        Il Consiglio d'Europa riconosce che il funzionamento delle democrazie dipende da inclusione sociale, integrazione e coinvolgimento
+        nella diversita linguistica e culturale.
+      </p>
+      <blockquote class="about-quote">
+        "The efficient functioning of democracies depends on social inclusion and societal integration."
+      </blockquote>
+      <p class="about-copy">
+        La Raccomandazione CM/Rec(2022)1 richiama l'importanza dell'educazione plurilingue e interculturale per sviluppo personale e professionale,
+        equita, diritti umani e partecipazione alla cultura democratica.
+      </p>
+    {% else %}
+      <p class="about-copy">
+        The Council of Europe recognizes that democratic societies depend on social inclusion, societal integration, and active engagement with
+        linguistic and cultural diversity.
+      </p>
+      <blockquote class="about-quote">
+        "The efficient functioning of democracies depends on social inclusion and societal integration."
+      </blockquote>
+      <p class="about-copy">
+        Recommendation CM/Rec(2022)1 gives renewed emphasis to plurilingual and intercultural education as a foundation for equity, human rights,
+        personal and professional development, and participation in democratic culture.
+      </p>
+    {% endif %}
+
+    <p class="about-cite">
+      Council of Europe (2022). The importance of plurilingual and intercultural education for democratic culture.
+      Recommendation CM/Rec(2022)1, p.11.
+    </p>
   </div>
 </section>
 {% endblock %}

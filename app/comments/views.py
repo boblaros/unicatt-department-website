@@ -1,7 +1,10 @@
-from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from posts.forms import CommentCreateForm
@@ -18,6 +21,7 @@ def create_comment_view(request, slug):
     if not request.user.is_verified_student:
         return HttpResponseForbidden('Only verified students can comment.')
 
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     post = get_object_or_404(Post.objects.published(), slug=slug)
     form = CommentCreateForm(request.POST)
     parent_id = request.POST.get('parent_id')
@@ -26,20 +30,36 @@ def create_comment_view(request, slug):
     if parent_id:
         parent = get_object_or_404(Comment, pk=parent_id, post=post)
         if parent.depth >= 5:
-            messages.error(request, 'Maximum reply depth reached.')
-            return redirect('posts:detail', slug=slug)
+            if is_ajax:
+                return JsonResponse({'ok': False, 'error': 'Maximum reply depth reached.'}, status=400)
+            return redirect(f"{reverse('posts:detail', kwargs={'slug': slug})}#comments")
 
     if form.is_valid():
         comment = form.save(commit=False)
         comment.post = post
         comment.author = request.user
         comment.parent = parent
+        try:
+            comment.full_clean()
+        except ValidationError as exc:
+            if is_ajax:
+                return JsonResponse({'ok': False, 'error': exc.messages[0]}, status=400)
+            return redirect(f"{reverse('posts:detail', kwargs={'slug': slug})}#comments")
         comment.save()
-        messages.success(request, 'Comment published.')
-    else:
-        messages.error(request, 'Failed to publish comment.')
+        if is_ajax:
+            html = render_to_string(
+                'comments/comment_item.html',
+                {'comment': comment, 'depth': comment.depth},
+                request=request,
+            )
+            return JsonResponse({'ok': True, 'comment_id': comment.id, 'parent_id': comment.parent_id, 'html': html})
+    elif is_ajax:
+        error_text = 'Failed to publish comment.'
+        if form.errors:
+            error_text = str(next(iter(form.errors.values()))[0])
+        return JsonResponse({'ok': False, 'error': error_text}, status=400)
 
-    return redirect('posts:detail', slug=slug)
+    return redirect(f"{reverse('posts:detail', kwargs={'slug': slug})}#comments")
 
 
 @login_required
@@ -51,4 +71,4 @@ def delete_comment_view(request, pk):
         return HttpResponseForbidden('You cannot delete this comment.')
     if not comment.soft_deleted:
         comment.soft_delete(request.user)
-    return redirect('posts:detail', slug=comment.post.slug)
+    return redirect(f"{reverse('posts:detail', kwargs={'slug': comment.post.slug})}#comments")

@@ -1,10 +1,13 @@
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from django.conf import settings
-from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
@@ -19,9 +22,18 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['latest_posts'] = Post.objects.published()[:3]
+        context['latest_posts'] = Post.objects.published().prefetch_related('images')[:3]
         context['quick_register_form'] = RegistrationForm()
-        context['wall_posts'] = WallPost.objects.select_related('author')[:30]
+        context['wall_posts'] = (
+            WallPost.objects.filter(parent__isnull=True)
+            .select_related('author')
+            .prefetch_related(
+                'replies__author',
+                'replies__replies__author',
+                'replies__replies__replies__author',
+                'replies__replies__replies__replies__author',
+            )[:30]
+        )
         return context
 
 
@@ -39,15 +51,44 @@ def create_wall_post(request):
     if request.user.is_banned:
         return HttpResponseForbidden('Banned users cannot post.')
 
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    parent_id = request.POST.get('parent_id')
+    parent = None
+    if parent_id:
+        parent = get_object_or_404(WallPost.objects.select_related('author'), pk=parent_id)
+
     form = WallPostForm(request.POST)
     if form.is_valid():
         wall_post = form.save(commit=False)
         wall_post.author = request.user
+        wall_post.parent = parent
+        try:
+            wall_post.full_clean()
+        except ValidationError as exc:
+            if is_ajax:
+                return JsonResponse({'ok': False, 'error': exc.messages[0]}, status=400)
+            return redirect(f"{reverse('core:home')}#wall")
         wall_post.save()
-        messages.success(request, 'Message posted to the community wall.')
-    else:
-        messages.error(request, 'Please add a valid message before posting.')
-    return redirect('core:home')
+        if is_ajax:
+            html = render_to_string(
+                'core/wall_post_item.html',
+                {'wall_post': wall_post, 'depth': wall_post.depth},
+                request=request,
+            )
+            return JsonResponse(
+                {
+                    'ok': True,
+                    'post_id': wall_post.id,
+                    'parent_id': wall_post.parent_id,
+                    'html': html,
+                }
+            )
+    elif is_ajax:
+        error_text = 'Please add a valid message before posting.'
+        if form.errors:
+            error_text = str(next(iter(form.errors.values()))[0])
+        return JsonResponse({'ok': False, 'error': error_text}, status=400)
+    return redirect(f"{reverse('core:home')}#wall")
 
 
 def switch_language(request, lang_code):

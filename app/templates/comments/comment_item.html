@@ -1,6 +1,6 @@
 {% load i18n %}
 {% get_current_language as CURRENT_LANGUAGE %}
-<article class="comment-card ms-{{ depth|add:'0' }} mt-2">
+<article class="comment-card ms-{{ depth|add:'0' }} mt-2" id="comment-{{ comment.id }}" data-comment-id="{{ comment.id }}">
   <div class="comment-head">
     <span class="comment-author">{{ comment.author.full_name|default:comment.author.email }}</span>
     <span class="comment-time">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
@@ -9,11 +9,12 @@
   <p class="comment-text">{{ comment.body }}</p>
 
   {% if request.user.is_authenticated and request.user.is_verified_student and not request.user.is_banned and depth < 5 and not comment.soft_deleted %}
-    <form method="post" action="{% url 'comments:create' comment.post.slug %}" class="reply-form mb-2">
+    <form method="post" action="{% url 'comments:create' comment.post.slug %}" class="reply-form mb-2 comment-create-form">
       {% csrf_token %}
       <input type="hidden" name="parent_id" value="{{ comment.id }}">
-      <textarea name="body" rows="2" class="input-control" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}"></textarea>
+      <textarea name="body" rows="1" class="input-control" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}"></textarea>
       <button type="submit" class="gc-btn gc-btn-ghost">{% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}</button>
+      <div class="comment-form-status" aria-live="polite"></div>
     </form>
   {% endif %}
 
@@ -26,7 +27,9 @@
     {% endif %}
   {% endif %}
 
-  {% for reply in comment.replies.all %}
-    {% include 'comments/comment_item.html' with comment=reply depth=depth|add:1 %}
-  {% endfor %}
+  <div class="comment-replies" id="comment-replies-{{ comment.id }}">
+    {% for reply in comment.replies.all %}
+      {% include 'comments/comment_item.html' with comment=reply depth=depth|add:1 %}
+    {% endfor %}
+  </div>
 </article>

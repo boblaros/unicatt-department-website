@@ -6,7 +6,7 @@
 {% get_current_language as CURRENT_LANGUAGE %}
 <section class="section pt-0">
   <div class="panel reveal">
-    <h1 class="headline" style="margin-bottom:14px;">
+    <h1 class="headline headline-strong" style="margin-bottom:14px;">
       <small>{% if CURRENT_LANGUAGE == 'it' %}Informazioni legali{% else %}Legal information{% endif %}</small>
       {% if CURRENT_LANGUAGE == 'it' %}
         PRIVACY<br>POLICY.
@@ -16,11 +16,85 @@
     </h1>
 
     {% if CURRENT_LANGUAGE == 'it' %}
-      <p class="blurb">Questa pagina è un segnaposto e deve essere sostituita con il testo legale ufficiale dell'università.</p>
-      <p>La struttura visuale è stata aggiornata; il contenuto normativo definitivo va inserito dal team legale.</p>
+      <p class="blurb">Informativa sintetica sul trattamento dei dati personali nel progetto Glocal Connections.</p>
+      <p class="policy-intro"><strong>Titolare del trattamento:</strong> Università Cattolica del Sacro Cuore.</p>
+
+      <div class="policy-grid">
+        <article class="policy-card">
+          <h2>Dati raccolti</h2>
+          <ul class="policy-list">
+            <li>Dati di registrazione (email istituzionale, nome, corso, anno, paese).</li>
+            <li>Contenuti pubblicati in piattaforma (commenti e wall post).</li>
+            <li>Dati tecnici essenziali per sicurezza e funzionamento.</li>
+          </ul>
+        </article>
+        <article class="policy-card">
+          <h2>Finalità</h2>
+          <ul class="policy-list">
+            <li>Gestione account e accessi.</li>
+            <li>Erogazione funzioni della piattaforma.</li>
+            <li>Moderazione e tutela della sicurezza del servizio.</li>
+          </ul>
+        </article>
+        <article class="policy-card">
+          <h2>Conservazione e condivisione</h2>
+          <ul class="policy-list">
+            <li>Conservazione per il tempo necessario a finalità operative e obblighi amministrativi.</li>
+            <li>Trattamento da personale autorizzato e fornitori tecnici nominati responsabili.</li>
+            <li>I dati non sono venduti a terzi.</li>
+          </ul>
+        </article>
+        <article class="policy-card">
+          <h2>Diritti utenti</h2>
+          <ul class="policy-list">
+            <li>Accesso, rettifica, cancellazione, limitazione, opposizione, portabilità.</li>
+            <li>Possibilità di reclamo all'autorità di controllo competente.</li>
+            <li>Contatti privacy: privacy@unicatt.it</li>
+          </ul>
+        </article>
+      </div>
+
+      <p class="policy-note">Ultimo aggiornamento: 3 marzo 2026.</p>
     {% else %}
-      <p class="blurb">This page is a placeholder and should be replaced with the official legal text of the university.</p>
-      <p>The visual layout is updated; final policy content should be provided by your legal team.</p>
+      <p class="blurb">A concise privacy notice for personal data processing in the Glocal Connections project.</p>
+      <p class="policy-intro"><strong>Data Controller:</strong> Università Cattolica del Sacro Cuore.</p>
+
+      <div class="policy-grid">
+        <article class="policy-card">
+          <h2>Data Collected</h2>
+          <ul class="policy-list">
+            <li>Registration data (institutional email, name, study program, year, country).</li>
+            <li>User content published on the platform (comments and wall posts).</li>
+            <li>Essential technical data for security and service operation.</li>
+          </ul>
+        </article>
+        <article class="policy-card">
+          <h2>Purposes</h2>
+          <ul class="policy-list">
+            <li>Account and access management.</li>
+            <li>Delivery of platform features.</li>
+            <li>Moderation and service security.</li>
+          </ul>
+        </article>
+        <article class="policy-card">
+          <h2>Retention and Sharing</h2>
+          <ul class="policy-list">
+            <li>Data is retained only as needed for operations and administrative obligations.</li>
+            <li>Processing may involve authorized staff and appointed technical providers.</li>
+            <li>Data is not sold to third parties.</li>
+          </ul>
+        </article>
+        <article class="policy-card">
+          <h2>Your Rights</h2>
+          <ul class="policy-list">
+            <li>Access, rectification, erasure, restriction, objection, and portability rights.</li>
+            <li>Right to lodge a complaint with the competent supervisory authority.</li>
+            <li>Privacy contact: privacy@unicatt.it</li>
+          </ul>
+        </article>
+      </div>
+
+      <p class="policy-note">Last updated: March 3, 2026.</p>
     {% endif %}
   </div>
 </section>

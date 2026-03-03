@@ -20,14 +20,20 @@
 <header class="site-header">
   <div class="wrap topbar">
     <a class="logo" href="{% url 'core:home' %}">
-      <span class="mark" aria-hidden="true">UC</span>
+      <span class="mark" aria-hidden="true">
+        <img
+          class="mark-logo"
+          src="/static/img/cattolica-logo-round.svg"
+          alt=""
+        >
+      </span>
       <span class="logotext">
-        <strong>UCSC Integration</strong>
+        <strong>Glocal Connections</strong>
         <span>
           {% if CURRENT_LANGUAGE == 'it' %}
             Comunità internazionale nel campus
           {% else %}
-            International campus community
+            Meet people • Practice languages • Feel at home
           {% endif %}
         </span>
       </span>
@@ -75,6 +81,7 @@
 <script>
   (function () {
     var anchors = document.querySelectorAll('a[href^="#"]');
+    var siteHeader = document.querySelector('.site-header');
     anchors.forEach(function (anchor) {
       anchor.addEventListener('click', function (event) {
         var id = anchor.getAttribute('href');
@@ -86,7 +93,11 @@
           return;
         }
         event.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        var headerOffset = siteHeader ? siteHeader.offsetHeight : 0;
+        var customOffset = parseInt(target.getAttribute('data-scroll-offset') || '', 10);
+        var extraOffset = isNaN(customOffset) ? 8 : customOffset;
+        var top = target.getBoundingClientRect().top + window.scrollY - headerOffset - extraOffset;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
       });
     });
 

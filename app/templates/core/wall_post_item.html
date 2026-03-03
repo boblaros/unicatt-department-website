@@ -1,0 +1,34 @@
+{% load i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
+<article
+  class="comment-card wall-thread-item depth-{{ depth }}"
+  id="wall-post-{{ wall_post.id }}"
+  data-post-id="{{ wall_post.id }}"
+>
+  <div class="comment-head">
+    <span class="comment-author">{{ wall_post.author.full_name|default:wall_post.author.email }}</span>
+    <span class="comment-time">{{ wall_post.created_at|date:"Y-m-d H:i" }}</span>
+  </div>
+  <div class="comment-text">{{ wall_post.body|linebreaksbr }}</div>
+
+  {% if request.user.is_authenticated and not request.user.is_banned and depth < 5 %}
+    <form method="post" action="{% url 'core:create_wall_post' %}" class="form-shell wall-post-form wall-reply-form">
+      {% csrf_token %}
+      <input type="hidden" name="parent_id" value="{{ wall_post.id }}">
+      <div class="field-row">
+        <label for="wall-reply-{{ wall_post.id }}">{% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}</label>
+        <textarea id="wall-reply-{{ wall_post.id }}" name="body" rows="1" maxlength="800" required class="input-control" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Scrivi una risposta...{% else %}Write a reply...{% endif %}"></textarea>
+      </div>
+      <div class="actions-row">
+        <button class="gc-btn gc-btn-ghost" type="submit">{% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}</button>
+      </div>
+      <div class="wall-form-status" aria-live="polite"></div>
+    </form>
+  {% endif %}
+
+  <div class="wall-replies" id="wall-replies-{{ wall_post.id }}">
+    {% for reply in wall_post.replies.all %}
+      {% include 'core/wall_post_item.html' with wall_post=reply depth=depth|add:1 %}
+    {% endfor %}
+  </div>
+</article>

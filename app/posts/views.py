@@ -14,11 +14,20 @@ class PostListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Post.objects.published()
+        return Post.objects.published().prefetch_related('images')
 
 
 def _comment_tree(post):
-    comments = Comment.objects.filter(post=post, parent__isnull=True).select_related('author')
+    comments = (
+        Comment.objects.filter(post=post, parent__isnull=True)
+        .select_related('author')
+        .prefetch_related(
+            'replies__author',
+            'replies__replies__author',
+            'replies__replies__replies__author',
+            'replies__replies__replies__replies__author',
+        )
+    )
     return comments
 
 

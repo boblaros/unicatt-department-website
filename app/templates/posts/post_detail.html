@@ -32,19 +32,19 @@
     </section>
   {% endif %}
 
-  <section class="panel reveal comments-wrap">
+  <section class="panel reveal comments-wrap" id="comments">
     <h2>{% trans "Comments" %}</h2>
 
     {% if request.user.is_authenticated and request.user.is_verified_student and not request.user.is_banned %}
-      <form method="post" action="{% url 'comments:create' post.slug %}" class="form-shell">
+      <form method="post" action="{% url 'comments:create' post.slug %}" class="form-shell comment-create-form" id="comment-create-form">
         {% csrf_token %}
         {{ comment_form.non_field_errors }}
         <div class="field-row">
-          <label for="id_body">{% if CURRENT_LANGUAGE == 'it' %}Commento{% else %}Comment{% endif %}</label>
           {{ comment_form.body }}
           {% for error in comment_form.body.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
         </div>
         <button class="gc-btn gc-btn-primary mt-2" type="submit">{% trans "Post comment" %}</button>
+        <div class="comment-form-status" aria-live="polite"></div>
       </form>
     {% elif request.user.is_authenticated and request.user.is_banned %}
       <p class="field-error">{% trans "You are banned and cannot comment." %}</p>
@@ -52,13 +52,118 @@
       <p>{% trans "Login as a verified student to comment." %}</p>
     {% endif %}
 
-    <div>
+    <div id="comments-list">
       {% for comment in comments %}
         {% include 'comments/comment_item.html' with comment=comment depth=1 %}
       {% empty %}
-        <p>{% trans "No comments yet." %}</p>
+        <p class="comment-empty">{% trans "No comments yet." %}</p>
       {% endfor %}
     </div>
   </section>
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  (function () {
+    var commentsSection = document.getElementById('comments');
+    var commentsList = document.getElementById('comments-list');
+    if (!commentsSection || !commentsList) {
+      return;
+    }
+
+    function parseJsonSafe(raw) {
+      try {
+        return raw ? JSON.parse(raw) : {};
+      } catch (err) {
+        return {};
+      }
+    }
+
+    function htmlToNode(html) {
+      var shell = document.createElement('template');
+      shell.innerHTML = html.trim();
+      return shell.content.firstElementChild;
+    }
+
+    document.addEventListener('submit', function (event) {
+      var form = event.target;
+      if (!form.classList.contains('comment-create-form')) {
+        return;
+      }
+      event.preventDefault();
+
+      if (form.dataset.submitting === '1') {
+        return;
+      }
+      form.dataset.submitting = '1';
+
+      var submitBtn = form.querySelector('button[type="submit"]');
+      var status = form.querySelector('.comment-form-status');
+      var textarea = form.querySelector('textarea[name="body"]');
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+      }
+      if (status) {
+        status.textContent = '';
+      }
+
+      var formData = new FormData(form);
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(function (response) {
+        return response.text().then(function (raw) {
+          return { response: response, data: parseJsonSafe(raw) };
+        });
+      })
+      .then(function (payload) {
+        var response = payload.response;
+        var data = payload.data || {};
+        if (!response.ok || !data.ok || !data.html) {
+          throw new Error(data.error || 'Unable to post comment.');
+        }
+
+        var node = htmlToNode(data.html);
+        if (!node) {
+          throw new Error('Unable to render new comment.');
+        }
+
+        if (data.parent_id) {
+          var replies = document.getElementById('comment-replies-' + data.parent_id);
+          if (!replies) {
+            throw new Error('Reply target not found.');
+          }
+          replies.appendChild(node);
+        } else {
+          var emptyState = commentsList.querySelector('.comment-empty');
+          if (emptyState) {
+            emptyState.remove();
+          }
+          commentsList.prepend(node);
+        }
+
+        if (textarea) {
+          textarea.value = '';
+          textarea.focus();
+        }
+      })
+      .catch(function (error) {
+        if (status) {
+          status.textContent = error.message;
+        }
+      })
+      .finally(function () {
+        form.dataset.submitting = '0';
+        if (submitBtn) {
+          submitBtn.disabled = false;
+        }
+      });
+    });
+  })();
+</script>
 {% endblock %}
