@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class Comment(models.Model):
@@ -37,13 +38,13 @@ class Comment(models.Model):
 
     def clean(self):
         if self.parent and self.parent.post_id != self.post_id:
-            raise ValidationError('Parent comment must belong to the same post.')
+            raise ValidationError(_('Parent comment must belong to the same post.'))
         if self.parent and self.parent.depth >= 5:
-            raise ValidationError('Maximum reply depth reached.')
+            raise ValidationError(_('Maximum reply depth reached.'))
 
     def soft_delete(self, actor):
         self.soft_deleted = True
         self.deleted_at = timezone.now()
         self.deleted_by = actor
-        self.body = '[deleted]'
+        self.body = _('[deleted]')
         self.save(update_fields=['soft_deleted', 'deleted_at', 'deleted_by', 'body'])

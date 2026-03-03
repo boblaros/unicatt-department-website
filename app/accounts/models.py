@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from .choices import COUNTRY_CHOICES, STUDY_PROGRAM_CHOICES, YEAR_OF_STUDY_CHOICES
 
@@ -10,7 +11,7 @@ from .choices import COUNTRY_CHOICES, STUDY_PROGRAM_CHOICES, YEAR_OF_STUDY_CHOIC
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError('Email is required')
+            raise ValueError(_('Email is required'))
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         if password:
@@ -24,7 +25,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_verified_student', True)
-        extra_fields.setdefault('full_name', 'Administrator')
+        extra_fields.setdefault('full_name', _('Administrator'))
         extra_fields.setdefault('study_program', 'medicine')
         extra_fields.setdefault('year_of_study', 'postgrad')
         extra_fields.setdefault('country_of_origin', 'IT')
@@ -60,10 +61,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def role(self):
         if self.is_superuser:
-            return 'Admin'
+            return _('Admin')
         if self.is_moderator:
-            return 'Moderator'
-        return 'Student'
+            return _('Moderator')
+        return _('Student')
 
 
 class RateLimitRecord(models.Model):

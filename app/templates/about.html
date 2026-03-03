@@ -18,14 +18,14 @@
 
     {% if CURRENT_LANGUAGE == 'it' %}
       <p class="blurb">
-        Benvenuti alla terza edizione di Glocal Connections, un progetto di peer mentoring interculturale che coinvolge studenti locali e internazionali.
+        Benvenuti alla terza edizione di Glocal Connections, un progetto di mentoring interculturale tra pari che coinvolge studenti locali e internazionali.
       </p>
       <p class="about-copy">
-        L'obiettivo e rafforzare il dialogo tra studenti, supportare l'adattamento degli studenti internazionali nella nuova realta di studio e di vita,
+        L'obiettivo è rafforzare il dialogo tra studenti, supportare l'adattamento degli studenti internazionali nella nuova realtà di studio e di vita,
         e offrire a tutti i partecipanti un'esperienza interculturale concreta.
       </p>
       <p class="about-copy">
-        Lo definiamo bilingue italiano-inglese, ma in pratica e multilingue: nelle edizioni precedenti gli studenti hanno comunicato anche in russo,
+        Lo definiamo bilingue italiano-inglese, ma in pratica è multilingue: nelle edizioni precedenti gli studenti hanno comunicato anche in russo,
         francese, spagnolo, tedesco e cinese.
       </p>
     {% else %}
@@ -53,7 +53,7 @@
       </article>
       <article class="tile reveal">
         <div class="tile-head"><strong>{% if CURRENT_LANGUAGE == 'it' %}Dimensione multilingue{% else %}Multilingual practice{% endif %}</strong><span class="tile-index">03</span></div>
-        <p>{% if CURRENT_LANGUAGE == 'it' %}Italiano e inglese come base, con spazio reale per piu lingue nella comunicazione tra pari.{% else %}Italian and English as a base, with real space for additional languages in peer communication.{% endif %}</p>
+        <p>{% if CURRENT_LANGUAGE == 'it' %}Italiano e inglese come base, con spazio reale per più lingue nella comunicazione tra pari.{% else %}Italian and English as a base, with real space for additional languages in peer communication.{% endif %}</p>
       </article>
     </div>
   </div>
@@ -66,14 +66,14 @@
     {% if CURRENT_LANGUAGE == 'it' %}
       <p class="about-copy">
         Il Consiglio d'Europa riconosce che il funzionamento delle democrazie dipende da inclusione sociale, integrazione e coinvolgimento
-        nella diversita linguistica e culturale.
+        nella diversità linguistica e culturale.
       </p>
       <blockquote class="about-quote">
-        "The efficient functioning of democracies depends on social inclusion and societal integration."
+        "Il funzionamento efficace delle democrazie dipende dall'inclusione sociale e dall'integrazione nella società."
       </blockquote>
       <p class="about-copy">
-        La Raccomandazione CM/Rec(2022)1 richiama l'importanza dell'educazione plurilingue e interculturale per sviluppo personale e professionale,
-        equita, diritti umani e partecipazione alla cultura democratica.
+        La Raccomandazione CM/Rec(2022)1 richiama l'importanza dell'educazione plurilingue e interculturale per lo sviluppo personale e professionale,
+        l'equità, i diritti umani e la partecipazione alla cultura democratica.
       </p>
     {% else %}
       <p class="about-copy">
@@ -90,8 +90,13 @@
     {% endif %}
 
     <p class="about-cite">
-      Council of Europe (2022). The importance of plurilingual and intercultural education for democratic culture.
-      Recommendation CM/Rec(2022)1, p.11.
+      {% if CURRENT_LANGUAGE == 'it' %}
+        Consiglio d'Europa (2022). L'importanza dell'educazione plurilingue e interculturale per la cultura democratica.
+        Raccomandazione CM/Rec(2022)1, p.11.
+      {% else %}
+        Council of Europe (2022). The importance of plurilingual and intercultural education for democratic culture.
+        Recommendation CM/Rec(2022)1, p.11.
+      {% endif %}
     </p>
   </div>
 </section>

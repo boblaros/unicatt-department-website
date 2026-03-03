@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
 from .forms import ForgotPasswordForm, LoginForm, RegistrationForm
@@ -30,7 +31,7 @@ def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email', '')
         if _rate_limited(request, 'login', email):
-            messages.error(request, 'Too many attempts. Please wait and try again.')
+            messages.error(request, _('Too many attempts. Please wait and try again.'))
             return render(request, 'account/login.html', {'form': form}, status=429)
         if form.is_valid():
             login(request, form.user)
@@ -49,7 +50,7 @@ def register_view(request):
         user.set_password(password)
         user.save()
         send_new_password_email(user.email, password)
-        messages.success(request, 'Registration successful. Check your email for your password.')
+        messages.success(request, _('Registration successful. Check your email for your password.'))
         return redirect('accounts:login')
     return render(request, 'account/register.html', {'form': form})
 
@@ -60,7 +61,7 @@ def forgot_password_view(request):
     if request.method == 'POST':
         email = request.POST.get('email', '')
         if _rate_limited(request, 'password_reset', email):
-            messages.error(request, 'Too many reset attempts. Please wait and try again.')
+            messages.error(request, _('Too many reset attempts. Please wait and try again.'))
             return render(request, 'account/forgot_password.html', {'form': form}, status=429)
         if form.is_valid():
             email = form.cleaned_data['email']
@@ -70,7 +71,7 @@ def forgot_password_view(request):
                 user.set_password(password)
                 user.save(update_fields=['password'])
                 send_new_password_email(user.email, password)
-            messages.success(request, 'If the email is registered, a new password has been sent.')
+            messages.success(request, _('If the email is registered, a new password has been sent.'))
             return redirect('accounts:login')
     return render(request, 'account/forgot_password.html', {'form': form})
 

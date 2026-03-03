@@ -1,0 +1,298 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: university-department-website\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-03 00:00+0000\n"
+"PO-Revision-Date: 2026-03-03 00:00+0000\n"
+"Last-Translator: Codex\n"
+"Language-Team: Italian\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Privacy"
+msgstr "Privacy"
+
+msgid "Home"
+msgstr "Home"
+
+msgid "News"
+msgstr "Notizie"
+
+msgid "About"
+msgstr "Chi siamo"
+
+msgid "Logout"
+msgstr "Esci"
+
+msgid "Login"
+msgstr "Accedi"
+
+msgid "Register"
+msgstr "Registrati"
+
+msgid "Read"
+msgstr "Leggi"
+
+msgid "No posts yet."
+msgstr "Nessun post ancora."
+
+msgid "Back to News"
+msgstr "Torna alle notizie"
+
+msgid "Gallery"
+msgstr "Galleria"
+
+msgid "Comments"
+msgstr "Commenti"
+
+msgid "Post comment"
+msgstr "Pubblica commento"
+
+msgid "You are banned and cannot comment."
+msgstr "Sei stato bloccato e non puoi commentare."
+
+msgid "Login as a verified student to comment."
+msgstr "Accedi come studente verificato per commentare."
+
+msgid "No comments yet."
+msgstr "Nessun commento ancora."
+
+msgid "Forgot password?"
+msgstr "Password dimenticata?"
+
+msgid "No news available."
+msgstr "Nessuna notizia disponibile."
+
+msgid "Forgot Password"
+msgstr "Recupero password"
+
+msgid "Send new password"
+msgstr "Invia nuova password"
+
+msgid "Only @unicatt.it and @icatt.it emails can register."
+msgstr "Possono registrarsi solo le email @unicatt.it e @icatt.it."
+
+msgid "Main navigation"
+msgstr "Navigazione principale"
+
+msgid "Language switcher"
+msgstr "Selettore lingua"
+
+msgid "Unable to post message."
+msgstr "Impossibile pubblicare il messaggio."
+
+msgid "Unable to render new message."
+msgstr "Impossibile visualizzare il nuovo messaggio."
+
+msgid "Reply target not found."
+msgstr "Destinazione della risposta non trovata."
+
+msgid "Unable to post comment."
+msgstr "Impossibile pubblicare il commento."
+
+msgid "Unable to render new comment."
+msgstr "Impossibile visualizzare il nuovo commento."
+
+msgid "News pagination"
+msgstr "Paginazione notizie"
+
+msgid "Too many attempts. Please wait and try again."
+msgstr "Troppi tentativi. Attendi e riprova."
+
+msgid "Registration successful. Check your email for your password."
+msgstr "Registrazione completata. Controlla la tua email per la password."
+
+msgid "Too many reset attempts. Please wait and try again."
+msgstr "Troppi tentativi di reset. Attendi e riprova."
+
+msgid "If the email is registered, a new password has been sent."
+msgstr "Se l'email è registrata, è stata inviata una nuova password."
+
+msgid "Banned users cannot comment."
+msgstr "Gli utenti bloccati non possono commentare."
+
+msgid "Only verified students can comment."
+msgstr "Solo gli studenti verificati possono commentare."
+
+msgid "Maximum reply depth reached."
+msgstr "È stata raggiunta la profondità massima delle risposte."
+
+msgid "Failed to publish comment."
+msgstr "Pubblicazione del commento non riuscita."
+
+msgid "You cannot delete this comment."
+msgstr "Non puoi eliminare questo commento."
+
+msgid "Banned users cannot post."
+msgstr "Gli utenti bloccati non possono pubblicare."
+
+msgid "Please add a valid message before posting."
+msgstr "Inserisci un messaggio valido prima di pubblicare."
+
+msgid "Parent comment must belong to the same post."
+msgstr "Il commento padre deve appartenere allo stesso post."
+
+msgid "Draft"
+msgstr "Bozza"
+
+msgid "Published"
+msgstr "Pubblicato"
+
+msgid "Image for %(post_id)s"
+msgstr "Immagine per %(post_id)s"
+
+msgid "Only JPG, PNG, and WEBP files are allowed."
+msgstr "Sono consentiti solo file JPG, PNG e WEBP."
+
+msgid "Image exceeds max size of %(size)sMB."
+msgstr "L'immagine supera la dimensione massima di %(size)sMB."
+
+msgid "Wall post cannot reply to itself."
+msgstr "Un post in bacheca non può rispondere a sé stesso."
+
+msgid "Write your comment..."
+msgstr "Scrivi il tuo commento..."
+
+msgid "Share your message with the community..."
+msgstr "Condividi il tuo messaggio con la comunità..."
+
+msgid "Email is required"
+msgstr "L'email è obbligatoria"
+
+msgid "Administrator"
+msgstr "Amministratore"
+
+msgid "Admin"
+msgstr "Amministratore"
+
+msgid "Moderator"
+msgstr "Moderatore"
+
+msgid "Student"
+msgstr "Studente"
+
+msgid "Profile"
+msgstr "Profilo"
+
+msgid "Roles"
+msgstr "Ruoli"
+
+msgid "Dates"
+msgstr "Date"
+
+msgid "Medicine and Surgery"
+msgstr "Medicina e Chirurgia"
+
+msgid "Economics and Management"
+msgstr "Economia e Management"
+
+msgid "Law"
+msgstr "Giurisprudenza"
+
+msgid "Psychology"
+msgstr "Psicologia"
+
+msgid "Education Sciences"
+msgstr "Scienze dell'Educazione"
+
+msgid "Nursing"
+msgstr "Infermieristica"
+
+msgid "1st year"
+msgstr "1º anno"
+
+msgid "2nd year"
+msgstr "2º anno"
+
+msgid "3rd year"
+msgstr "3º anno"
+
+msgid "4th year"
+msgstr "4º anno"
+
+msgid "5th year"
+msgstr "5º anno"
+
+msgid "6th year"
+msgstr "6º anno"
+
+msgid "Postgraduate"
+msgstr "Post-laurea"
+
+msgid "Italy"
+msgstr "Italia"
+
+msgid "Albania"
+msgstr "Albania"
+
+msgid "Brazil"
+msgstr "Brasile"
+
+msgid "China"
+msgstr "Cina"
+
+msgid "France"
+msgstr "Francia"
+
+msgid "Germany"
+msgstr "Germania"
+
+msgid "India"
+msgstr "India"
+
+msgid "Nigeria"
+msgstr "Nigeria"
+
+msgid "Spain"
+msgstr "Spagna"
+
+msgid "Turkey"
+msgstr "Turchia"
+
+msgid "Ukraine"
+msgstr "Ucraina"
+
+msgid "United States"
+msgstr "Stati Uniti"
+
+msgid "Other"
+msgstr "Altro"
+
+msgid "Invalid credentials."
+msgstr "Credenziali non valide."
+
+msgid "This account is banned."
+msgstr "Questo account è bloccato."
+
+msgid "This account is inactive."
+msgstr "Questo account non è attivo."
+
+msgid "Only @unicatt.it and @icatt.it emails are allowed."
+msgstr "Sono consentite solo email @unicatt.it e @icatt.it."
+
+msgid "An account with this email already exists."
+msgstr "Esiste già un account con questa email."
+
+msgid "Only university student emails are supported."
+msgstr "Sono supportate solo email universitarie studentesche."
+
+msgid "Your UCSC integration portal password"
+msgstr "La tua password del portale di integrazione UCSC"
+
+msgid "Your new password has been generated."
+msgstr "La tua nuova password è stata generata."
+
+msgid "Email: %(email)s"
+msgstr "Email: %(email)s"
+
+msgid "Password: %(password)s"
+msgstr "Password: %(password)s"
+
+msgid "Please keep it secure."
+msgstr "Conservala in modo sicuro."
+
+msgid "[deleted]"
+msgstr "[eliminato]"

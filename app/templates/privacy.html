@@ -5,13 +5,16 @@
 {% block content %}
 {% get_current_language as CURRENT_LANGUAGE %}
 <section class="section pt-0">
-  <div class="panel reveal">
+  <div class="panel reveal privacy-panel">
+    <p class="policy-note policy-note-corner">
+      {% if CURRENT_LANGUAGE == 'it' %}Ultimo aggiornamento: 3 marzo 2026.{% else %}Last updated: March 3, 2026.{% endif %}
+    </p>
     <h1 class="headline headline-strong" style="margin-bottom:14px;">
       <small>{% if CURRENT_LANGUAGE == 'it' %}Informazioni legali{% else %}Legal information{% endif %}</small>
       {% if CURRENT_LANGUAGE == 'it' %}
-        PRIVACY<br>POLICY.
+        INFORMATIVA PRIVACY
       {% else %}
-        PRIVACY<br>POLICY.
+        PRIVACY POLICY
       {% endif %}
     </h1>
 
@@ -24,7 +27,7 @@
           <h2>Dati raccolti</h2>
           <ul class="policy-list">
             <li>Dati di registrazione (email istituzionale, nome, corso, anno, paese).</li>
-            <li>Contenuti pubblicati in piattaforma (commenti e wall post).</li>
+            <li>Contenuti pubblicati in piattaforma (commenti e messaggi in bacheca).</li>
             <li>Dati tecnici essenziali per sicurezza e funzionamento.</li>
           </ul>
         </article>
@@ -54,7 +57,6 @@
         </article>
       </div>
 
-      <p class="policy-note">Ultimo aggiornamento: 3 marzo 2026.</p>
     {% else %}
       <p class="blurb">A concise privacy notice for personal data processing in the Glocal Connections project.</p>
       <p class="policy-intro"><strong>Data Controller:</strong> Università Cattolica del Sacro Cuore.</p>
@@ -94,7 +96,6 @@
         </article>
       </div>
 
-      <p class="policy-note">Last updated: March 3, 2026.</p>
     {% endif %}
   </div>
 </section>

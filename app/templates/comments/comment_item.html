@@ -6,7 +6,11 @@
     <span class="comment-time">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
   </div>
 
-  <p class="comment-text">{{ comment.body }}</p>
+  {% if comment.soft_deleted %}
+    <p class="comment-text">{% if CURRENT_LANGUAGE == 'it' %}[commento eliminato]{% else %}[deleted]{% endif %}</p>
+  {% else %}
+    <p class="comment-text">{{ comment.body }}</p>
+  {% endif %}
 
   {% if request.user.is_authenticated and request.user.is_verified_student and not request.user.is_banned and depth < 5 and not comment.soft_deleted %}
     <form method="post" action="{% url 'comments:create' comment.post.slug %}" class="reply-form mb-2 comment-create-form">

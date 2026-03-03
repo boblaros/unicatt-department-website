@@ -26,8 +26,8 @@
 
       <p class="subline">
         {% if CURRENT_LANGUAGE == 'it' %}
-          Benvenuti nel dipartimento di integrazione dell'Università Cattolica del Sacro Cuore.
-          Qui trovi notizie, attività e strumenti utili per inserirti rapidamente nella vita universitaria.
+          Nuova città, nuovo campus: non devi ricominciare da zero.
+          Glocal aiuta studenti internazionali e locali a connettersi in modo rapido e naturale.
         {% else %}
           New city, new campus - you don't have to start from zero.
           Glocal helps international + local students connect quickly and naturally.
@@ -36,7 +36,7 @@
 
       <p class="microcopy">
         {% if request.user.is_authenticated and CURRENT_LANGUAGE == 'it' %}
-          Ora puoi usare direttamente le funzioni community: commenti alle notizie e messaggi pubblici sulla wall del dipartimento.
+          Ora puoi usare direttamente le funzionalità della comunità: commenti alle notizie e messaggi pubblici sulla bacheca del dipartimento.
         {% elif request.user.is_authenticated %}
           You can now use the community features directly: comments on news and public messages on the department wall.
         {% elif CURRENT_LANGUAGE == 'it' %}
@@ -52,9 +52,9 @@
         {% else %}
           <a class="gc-btn gc-btn-primary" href="{% url 'accounts:register' %}">{% if CURRENT_LANGUAGE == 'it' %}Registrati{% else %}Join now{% endif %}</a>
         {% endif %}
-        <a class="gc-btn gc-btn-ghost" href="#news">{% if CURRENT_LANGUAGE == 'it' %}See past moments{% else %}See past moments{% endif %}</a>
+        <a class="gc-btn gc-btn-ghost" href="#news">{% if CURRENT_LANGUAGE == 'it' %}Rivedi i momenti passati{% else %}See past moments{% endif %}</a>
         {% if request.user.is_authenticated %}
-          <a class="gc-btn gc-btn-ghost" href="#wall">{% if CURRENT_LANGUAGE == 'it' %}See community wall{% else %}See community wall{% endif %}</a>
+          <a class="gc-btn gc-btn-ghost" href="#wall">{% if CURRENT_LANGUAGE == 'it' %}Vai alla bacheca della comunità{% else %}See community wall{% endif %}</a>
         {% endif %}
       </div>
     </div>
@@ -114,7 +114,7 @@
         </div>
         <div class="actions-row">
           <button class="gc-btn gc-btn-primary" type="submit">{% if CURRENT_LANGUAGE == 'it' %}Registrati{% else %}Register{% endif %}</button>
-          <a class="gc-btn gc-btn-ghost" href="#wall">{% if CURRENT_LANGUAGE == 'it' %}Vai al wall{% else %}See community wall{% endif %}</a>
+          <a class="gc-btn gc-btn-ghost" href="#wall">{% if CURRENT_LANGUAGE == 'it' %}Vai alla bacheca{% else %}See community wall{% endif %}</a>
         </div>
       </form>
     </aside>
@@ -123,24 +123,24 @@
 
   <div class="marquee" aria-hidden="true">
     <div class="track">
-      <span><i class="spark"></i> CAMPUS COMMUNITY</span>
-      <span><i class="spark"></i> INTERNATIONAL STUDENTS</span>
-      <span><i class="spark"></i> VERIFIED ACCOUNTS</span>
-      <span><i class="spark"></i> NEWS & EVENTS</span>
-      <span><i class="spark"></i> MULTILINGUAL SUPPORT</span>
+      <span><i class="spark"></i> {% if CURRENT_LANGUAGE == 'it' %}COMUNITÀ DI CAMPUS{% else %}CAMPUS COMMUNITY{% endif %}</span>
+      <span><i class="spark"></i> {% if CURRENT_LANGUAGE == 'it' %}STUDENTI INTERNAZIONALI{% else %}INTERNATIONAL STUDENTS{% endif %}</span>
+      <span><i class="spark"></i> {% if CURRENT_LANGUAGE == 'it' %}ACCOUNT VERIFICATI{% else %}VERIFIED ACCOUNTS{% endif %}</span>
+      <span><i class="spark"></i> {% if CURRENT_LANGUAGE == 'it' %}NOTIZIE ED EVENTI{% else %}NEWS & EVENTS{% endif %}</span>
+      <span><i class="spark"></i> {% if CURRENT_LANGUAGE == 'it' %}SUPPORTO MULTILINGUE{% else %}MULTILINGUAL SUPPORT{% endif %}</span>
 
-      <span><i class="spark"></i> CAMPUS COMMUNITY</span>
-      <span><i class="spark"></i> INTERNATIONAL STUDENTS</span>
-      <span><i class="spark"></i> VERIFIED ACCOUNTS</span>
-      <span><i class="spark"></i> NEWS & EVENTS</span>
-      <span><i class="spark"></i> MULTILINGUAL SUPPORT</span>
+      <span><i class="spark"></i> {% if CURRENT_LANGUAGE == 'it' %}COMUNITÀ DI CAMPUS{% else %}CAMPUS COMMUNITY{% endif %}</span>
+      <span><i class="spark"></i> {% if CURRENT_LANGUAGE == 'it' %}STUDENTI INTERNAZIONALI{% else %}INTERNATIONAL STUDENTS{% endif %}</span>
+      <span><i class="spark"></i> {% if CURRENT_LANGUAGE == 'it' %}ACCOUNT VERIFICATI{% else %}VERIFIED ACCOUNTS{% endif %}</span>
+      <span><i class="spark"></i> {% if CURRENT_LANGUAGE == 'it' %}NOTIZIE ED EVENTI{% else %}NEWS & EVENTS{% endif %}</span>
+      <span><i class="spark"></i> {% if CURRENT_LANGUAGE == 'it' %}SUPPORTO MULTILINGUE{% else %}MULTILINGUAL SUPPORT{% endif %}</span>
     </div>
   </div>
 </section>
 
 <section class="section why-join" id="why">
   <h2 class="headline headline-strong reveal">
-    <small>{% if CURRENT_LANGUAGE == 'it' %}Perche gli studenti partecipano{% else %}WHY STUDENTS JOIN{% endif %}</small>
+    <small>{% if CURRENT_LANGUAGE == 'it' %}Perché gli studenti partecipano{% else %}WHY STUDENTS JOIN{% endif %}</small>
     {% if CURRENT_LANGUAGE == 'it' %}
       UNA PARTENZA<br>RAPIDA NEL CAMPUS.
     {% else %}
@@ -150,8 +150,8 @@
 
   <p class="blurb why-lead reveal">
     {% if CURRENT_LANGUAGE == 'it' %}
-      Trasferirsi in un nuovo Paese e emozionante ma puo anche farti sentire solo.
-      Glocal e un percorso strutturato e senza pressione per creare comunita, praticare lingue e sentirti sicuro nel nuovo ambiente.
+      Trasferirsi in un nuovo Paese è emozionante ma può anche farti sentire solo.
+      Glocal è un percorso strutturato e senza pressione per creare comunità, praticare lingue e sentirti sicuro nel nuovo ambiente.
     {% else %}
       Moving countries is exciting and isolating.
       Glocal is a structured, low-pressure way to build community, practice languages, and feel confident in a new environment.
@@ -161,11 +161,11 @@
   <div class="tiles">
     <article class="tile reveal">
       <div class="tile-head"><strong>{% if CURRENT_LANGUAGE == 'it' %}MENO ISOLAMENTO{% else %}LESS ISOLATION{% endif %}</strong><span class="tile-index">01</span></div>
-      <p>{% if CURRENT_LANGUAGE == 'it' %}Conosci subito un piccolo gruppo, prima che la routine renda piu difficile fare nuove amicizie.{% else %}Meet a small circle early before routines lock in and meeting people becomes harder.{% endif %}</p>
+      <p>{% if CURRENT_LANGUAGE == 'it' %}Conosci subito un piccolo gruppo, prima che la routine renda più difficile fare nuove amicizie.{% else %}Meet a small circle early before routines lock in and meeting people becomes harder.{% endif %}</p>
     </article>
     <article class="tile reveal">
       <div class="tile-head"><strong>{% if CURRENT_LANGUAGE == 'it' %}FIDUCIA LINGUISTICA{% else %}LANGUAGE CONFIDENCE{% endif %}</strong><span class="tile-index">02</span></div>
-      <p>{% if CURRENT_LANGUAGE == 'it' %}Pratica senza giudizio. Cambiare lingua durante una conversazione e normale e aiuta a migliorare.{% else %}Practice without judgment. Switching languages is normal and it helps progress.{% endif %}</p>
+      <p>{% if CURRENT_LANGUAGE == 'it' %}Pratica senza giudizio. Cambiare lingua durante una conversazione è normale e aiuta a migliorare.{% else %}Practice without judgment. Switching languages is normal and it helps progress.{% endif %}</p>
     </article>
     <article class="tile reveal">
       <div class="tile-head"><strong>{% if CURRENT_LANGUAGE == 'it' %}ORIENTAMENTO REALE{% else %}REAL-LIFE NAVIGATION{% endif %}</strong><span class="tile-index">03</span></div>
@@ -195,7 +195,7 @@
     </article>
     <article class="tile reveal">
       <div class="tile-head"><strong>{% if CURRENT_LANGUAGE == 'it' %}Connettiti{% else %}Network{% endif %}</strong><span class="tile-index">03</span></div>
-      <p>{% if CURRENT_LANGUAGE == 'it' %}Usa la wall pubblica per trovare persone con interessi simili.{% else %}Connect with people who share your interests and integrate quickly into university life.{% endif %}</p>
+      <p>{% if CURRENT_LANGUAGE == 'it' %}Usa la bacheca pubblica per trovare persone con interessi simili.{% else %}Connect with people who share your interests and integrate quickly into university life.{% endif %}</p>
     </article>
   </div>
 </section>
@@ -217,9 +217,17 @@
           {% if first_image %}
             <a class="news-card-image" href="{% url 'posts:detail' post.slug %}">
               {% if first_image.thumbnail %}
-                <img src="{{ first_image.thumbnail.url }}" alt="{{ first_image.caption|default:post.title_en }}">
+                {% if CURRENT_LANGUAGE == 'it' %}
+                  <img src="{{ first_image.thumbnail.url }}" alt="{{ first_image.caption|default:post.title_it }}">
+                {% else %}
+                  <img src="{{ first_image.thumbnail.url }}" alt="{{ first_image.caption|default:post.title_en }}">
+                {% endif %}
               {% else %}
-                <img src="{{ first_image.image.url }}" alt="{{ first_image.caption|default:post.title_en }}">
+                {% if CURRENT_LANGUAGE == 'it' %}
+                  <img src="{{ first_image.image.url }}" alt="{{ first_image.caption|default:post.title_it }}">
+                {% else %}
+                  <img src="{{ first_image.image.url }}" alt="{{ first_image.caption|default:post.title_en }}">
+                {% endif %}
               {% endif %}
             </a>
           {% endif %}
@@ -240,7 +248,7 @@
 
 <section class="section" id="wall">
   <h2 class="headline headline-strong reveal" id="wall-heading" data-scroll-offset="10">
-    <small>{% if CURRENT_LANGUAGE == 'it' %}Community wall{% else %}Community wall{% endif %}</small>
+    <small>{% if CURRENT_LANGUAGE == 'it' %}Bacheca della comunità{% else %}Community wall{% endif %}</small>
     {% if CURRENT_LANGUAGE == 'it' %}
       PRESENTATI.<br>TROVA IL TUO GRUPPO.
     {% else %}
@@ -258,12 +266,12 @@
 
   <div class="wall wall-single">
     <div class="panel reveal">
-      <h3>{% if CURRENT_LANGUAGE == 'it' %}Scrivi un messaggio breve sulla wall comune.{% else %}Write a short message to the shared wall.{% endif %}</h3>
+      <h3>{% if CURRENT_LANGUAGE == 'it' %}Scrivi un messaggio breve sulla bacheca comune.{% else %}Write a short message to the shared wall.{% endif %}</h3>
       {% if request.user.is_authenticated %}
       <form method="post" action="{% url 'core:create_wall_post' %}" class="form-shell wall-post-form" id="wall-form">
         {% csrf_token %}
         <div class="field-row">
-          <textarea id="id_body" name="body" rows="4" maxlength="800" required class="input-control" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Scrivi il tuo messaggio alla community...{% else %}Write your message to the community...{% endif %}"></textarea>
+          <textarea id="id_body" name="body" rows="4" maxlength="800" required class="input-control" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Scrivi il tuo messaggio alla comunità...{% else %}Write your message to the community...{% endif %}"></textarea>
         </div>
         <div class="actions-row">
           <button class="gc-btn gc-btn-primary" type="submit">{% if CURRENT_LANGUAGE == 'it' %}Pubblica{% else %}Post{% endif %}</button>
@@ -271,7 +279,7 @@
         <div class="wall-form-status" id="wall-form-status" aria-live="polite"></div>
       </form>
       {% else %}
-      <p>{% if CURRENT_LANGUAGE == 'it' %}Per pubblicare sulla wall devi prima accedere o registrarti.{% else %}To post on the wall, please login or register first.{% endif %}</p>
+      <p>{% if CURRENT_LANGUAGE == 'it' %}Per pubblicare sulla bacheca devi prima accedere o registrarti.{% else %}To post on the wall, please login or register first.{% endif %}</p>
       <div class="actions-row">
         <a class="gc-btn gc-btn-primary" href="{% url 'accounts:register' %}">{% if CURRENT_LANGUAGE == 'it' %}Registrati{% else %}Register{% endif %}</a>
         <a class="gc-btn gc-btn-ghost" href="{% url 'accounts:login' %}">{% if CURRENT_LANGUAGE == 'it' %}Accedi{% else %}Login{% endif %}</a>
@@ -355,12 +363,12 @@
         var response = payload.response;
         var data = payload.data || {};
         if (!response.ok || !data.ok || !data.html) {
-          throw new Error(data.error || 'Unable to post message.');
+          throw new Error(data.error || "{% trans 'Unable to post message.' %}");
         }
 
         var node = htmlToNode(data.html);
         if (!node) {
-          throw new Error('Unable to render new message.');
+          throw new Error("{% trans 'Unable to render new message.' %}");
         }
 
         var emptyState = wallList.querySelector('.wall-empty');
@@ -371,7 +379,7 @@
         if (data.parent_id) {
           var replies = document.getElementById('wall-replies-' + data.parent_id);
           if (!replies) {
-            throw new Error('Reply target not found.');
+            throw new Error("{% trans 'Reply target not found.' %}");
           }
           replies.appendChild(node);
         } else {

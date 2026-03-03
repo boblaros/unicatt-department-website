@@ -30,9 +30,17 @@
           {% if first_image %}
             <a class="news-card-image" href="{% url 'posts:detail' post.slug %}">
               {% if first_image.thumbnail %}
-                <img src="{{ first_image.thumbnail.url }}" alt="{{ first_image.caption|default:post.title_en }}">
+                {% if CURRENT_LANGUAGE == 'it' %}
+                  <img src="{{ first_image.thumbnail.url }}" alt="{{ first_image.caption|default:post.title_it }}">
+                {% else %}
+                  <img src="{{ first_image.thumbnail.url }}" alt="{{ first_image.caption|default:post.title_en }}">
+                {% endif %}
               {% else %}
-                <img src="{{ first_image.image.url }}" alt="{{ first_image.caption|default:post.title_en }}">
+                {% if CURRENT_LANGUAGE == 'it' %}
+                  <img src="{{ first_image.image.url }}" alt="{{ first_image.caption|default:post.title_it }}">
+                {% else %}
+                  <img src="{{ first_image.image.url }}" alt="{{ first_image.caption|default:post.title_en }}">
+                {% endif %}
               {% endif %}
             </a>
           {% endif %}
@@ -51,7 +59,7 @@
   </div>
 
   {% if is_paginated %}
-    <nav class="pagination-shell" aria-label="News pagination">
+    <nav class="pagination-shell" aria-label="{% trans 'News pagination' %}">
       {% if page_obj.has_previous %}
         <a href="?page={{ page_obj.previous_page_number }}">{% if CURRENT_LANGUAGE == 'it' %}Precedente{% else %}Previous{% endif %}</a>
       {% endif %}

@@ -22,9 +22,17 @@
         {% for image in post.images.all %}
           <a class="gallery-item" href="{{ image.image.url }}" target="_blank" rel="noopener">
             {% if image.thumbnail %}
-              <img src="{{ image.thumbnail.url }}" alt="{{ image.caption|default:post.title_en }}">
+              {% if CURRENT_LANGUAGE == 'it' %}
+                <img src="{{ image.thumbnail.url }}" alt="{{ image.caption|default:post.title_it }}">
+              {% else %}
+                <img src="{{ image.thumbnail.url }}" alt="{{ image.caption|default:post.title_en }}">
+              {% endif %}
             {% else %}
-              <img src="{{ image.image.url }}" alt="{{ image.caption|default:post.title_en }}">
+              {% if CURRENT_LANGUAGE == 'it' %}
+                <img src="{{ image.image.url }}" alt="{{ image.caption|default:post.title_it }}">
+              {% else %}
+                <img src="{{ image.image.url }}" alt="{{ image.caption|default:post.title_en }}">
+              {% endif %}
             {% endif %}
           </a>
         {% endfor %}
@@ -125,18 +133,18 @@
         var response = payload.response;
         var data = payload.data || {};
         if (!response.ok || !data.ok || !data.html) {
-          throw new Error(data.error || 'Unable to post comment.');
+          throw new Error(data.error || "{% trans 'Unable to post comment.' %}");
         }
 
         var node = htmlToNode(data.html);
         if (!node) {
-          throw new Error('Unable to render new comment.');
+          throw new Error("{% trans 'Unable to render new comment.' %}");
         }
 
         if (data.parent_id) {
           var replies = document.getElementById('comment-replies-' + data.parent_id);
           if (!replies) {
-            throw new Error('Reply target not found.');
+            throw new Error("{% trans 'Reply target not found.' %}");
           }
           replies.appendChild(node);
         } else {

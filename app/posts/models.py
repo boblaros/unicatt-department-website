@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import models
 from django.template.defaultfilters import slugify
+from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
 
@@ -30,8 +31,8 @@ class PublishedPostQuerySet(models.QuerySet):
 
 class Post(models.Model):
     class Status(models.TextChoices):
-        DRAFT = 'draft', 'Draft'
-        PUBLISHED = 'published', 'Published'
+        DRAFT = 'draft', _('Draft')
+        PUBLISHED = 'published', _('Published')
 
     title_it = models.CharField(max_length=255)
     title_en = models.CharField(max_length=255)
@@ -80,7 +81,7 @@ class PostImage(models.Model):
         ordering = ['created_at']
 
     def __str__(self):
-        return f'Image for {self.post_id}'
+        return _('Image for %(post_id)s') % {'post_id': self.post_id}
 
     def clean(self):
         uploaded = self.image
@@ -89,11 +90,11 @@ class PostImage(models.Model):
         content_type = getattr(uploaded.file, 'content_type', None)
         ext = uploaded.name.split('.')[-1].lower()
         if ext not in {'jpg', 'jpeg', 'png', 'webp'}:
-            raise ValidationError('Only JPG, PNG, and WEBP files are allowed.')
+            raise ValidationError(_('Only JPG, PNG, and WEBP files are allowed.'))
         if content_type and content_type not in ALLOWED_CONTENT_TYPES:
-            raise ValidationError('Only JPG, PNG, and WEBP files are allowed.')
+            raise ValidationError(_('Only JPG, PNG, and WEBP files are allowed.'))
         if uploaded.size > settings.MAX_UPLOAD_SIZE_BYTES:
-            raise ValidationError(f'Image exceeds max size of {settings.MAX_UPLOAD_SIZE_MB}MB.')
+            raise ValidationError(_('Image exceeds max size of %(size)sMB.') % {'size': settings.MAX_UPLOAD_SIZE_MB})
 
     def save(self, *args, **kwargs):
         self.full_clean(exclude=['thumbnail'])

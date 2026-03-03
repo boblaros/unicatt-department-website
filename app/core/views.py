@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
@@ -49,7 +50,7 @@ class PrivacyView(TemplateView):
 @require_POST
 def create_wall_post(request):
     if request.user.is_banned:
-        return HttpResponseForbidden('Banned users cannot post.')
+        return HttpResponseForbidden(_('Banned users cannot post.'))
 
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     parent_id = request.POST.get('parent_id')
@@ -84,7 +85,7 @@ def create_wall_post(request):
                 }
             )
     elif is_ajax:
-        error_text = 'Please add a valid message before posting.'
+        error_text = _('Please add a valid message before posting.')
         if form.errors:
             error_text = str(next(iter(form.errors.values()))[0])
         return JsonResponse({'ok': False, 'error': error_text}, status=400)

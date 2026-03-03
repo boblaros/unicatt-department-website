@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class WallPost(models.Model):
@@ -27,6 +28,6 @@ class WallPost(models.Model):
     def clean(self):
         # Only compare ids when this instance already has a primary key.
         if self.pk is not None and self.parent_id == self.pk:
-            raise ValidationError('Wall post cannot reply to itself.')
+            raise ValidationError(_('Wall post cannot reply to itself.'))
         if self.parent and self.parent.depth >= 5:
-            raise ValidationError('Maximum reply depth reached.')
+            raise ValidationError(_('Maximum reply depth reached.'))

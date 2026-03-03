@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import gettext_lazy as _
 
 from .models import RateLimitRecord, User
 
@@ -12,7 +13,7 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         (
-            'Profile',
+            _('Profile'),
             {
                 'fields': (
                     'full_name',
@@ -23,8 +24,8 @@ class UserAdmin(BaseUserAdmin):
                 )
             },
         ),
-        ('Roles', {'fields': ('is_moderator', 'is_banned', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Dates', {'fields': ('last_login', 'date_joined')}),
+        (_('Roles'), {'fields': ('is_moderator', 'is_banned', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        (_('Dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (

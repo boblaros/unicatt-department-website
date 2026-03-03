@@ -3,6 +3,7 @@ import string
 
 from django.conf import settings
 from django.core.mail import send_mail
+from django.utils.translation import gettext as _
 
 
 def generate_password(length=12):
@@ -11,11 +12,13 @@ def generate_password(length=12):
 
 
 def send_new_password_email(email, password):
-    subject = 'Your UCSC integration portal password'
+    subject = _('Your UCSC integration portal password')
     body = (
-        'Your new password has been generated.\n\n'
-        f'Email: {email}\n'
-        f'Password: {password}\n\n'
-        'Please keep it secure.'
+        _('Your new password has been generated.') + '\n\n'
+        + _('Email: %(email)s') % {'email': email}
+        + '\n'
+        + _('Password: %(password)s') % {'password': password}
+        + '\n\n'
+        + _('Please keep it secure.')
     )
     send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [email], fail_silently=False)

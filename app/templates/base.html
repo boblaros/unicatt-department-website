@@ -40,7 +40,7 @@
     </a>
 
     <div class="header-actions">
-      <nav class="navchips" aria-label="Main navigation">
+      <nav class="navchips" aria-label="{% trans 'Main navigation' %}">
         <a class="chip {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">{% trans "Home" %}</a>
         <a class="chip {% if request.resolver_match.namespace == 'posts' %}active{% endif %}" href="{% url 'posts:list' %}">{% if CURRENT_LANGUAGE == 'it' %}Notizie{% else %}{% trans "News" %}{% endif %}</a>
         <a class="chip {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">{% if CURRENT_LANGUAGE == 'it' %}Chi siamo{% else %}{% trans "About" %}{% endif %}</a>
@@ -48,7 +48,7 @@
       </nav>
 
       <div class="userbar">
-        <div class="lang-switch" aria-label="Language switcher">
+        <div class="lang-switch" aria-label="{% trans 'Language switcher' %}">
           <a href="{% url 'switch_language' 'en' %}?next={{ request.get_full_path|urlencode }}" class="chip chip-small {% if CURRENT_LANGUAGE == 'en' %}active{% endif %}">EN</a>
           <a href="{% url 'switch_language' 'it' %}?next={{ request.get_full_path|urlencode }}" class="chip chip-small {% if CURRENT_LANGUAGE == 'it' %}active{% endif %}">IT</a>
         </div>
