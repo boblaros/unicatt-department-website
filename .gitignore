@@ -10,3 +10,4 @@ media/
 .pytest_cache/
 .idea/
 .DS_Store
+SERVER_WORKFLOW.md
