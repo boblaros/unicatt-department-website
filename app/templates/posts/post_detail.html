@@ -107,7 +107,10 @@
       form.dataset.submitting = '1';
 
       var submitBtn = form.querySelector('button[type="submit"]');
-      var status = form.querySelector('.comment-form-status');
+      if (!submitBtn && form.id) {
+        submitBtn = document.querySelector('button[form="' + form.id + '"]');
+      }
+      var status = document.getElementById(form.dataset.statusId || '') || form.querySelector('.comment-form-status');
       var textarea = form.querySelector('textarea[name="body"]');
 
       if (submitBtn) {

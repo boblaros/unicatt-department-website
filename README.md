@@ -20,7 +20,7 @@ The repository originally contained an AI Studio/Vite React scaffold and no Djan
    - Nginx reverse proxy container
 3. Create Django project and apps:
    - `core` for public pages (`home`, `about`, `privacy`)
-   - `accounts` for custom auth user, domain-restricted registration, generated-password mail flow, forgot-password flow, rate limiting, ban/roles/profile data
+   - `accounts` for custom auth user, domain-restricted registration, secure password-setup/reset links, rate limiting, ban/roles/profile data
    - `posts` for bilingual news posts and gallery images (EXIF stripping + thumbnails + size/type validation)
    - `comments` for threaded nested post comments (depth cap 5), soft delete, moderator/admin delete
 4. Implement server-rendered templates + Bootstrap CDN + minimal CSS.
@@ -119,8 +119,8 @@ The repository originally contained an AI Studio/Vite React scaffold and no Djan
 - Auth:
   - Email/password login with custom user model (`email` as username)
   - Registration restricted to `@unicatt.it` and `@icatt.it`
-  - Registration sends generated password by email
-  - Forgot-password sends a newly generated password
+  - Registration sends a secure password-setup link by email
+  - Forgot-password sends a secure password-reset link
   - Password hashing via Django hashers
 - Roles:
   - Student (default)

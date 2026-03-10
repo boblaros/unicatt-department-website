@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -9,6 +10,13 @@ from .choices import COUNTRY_CHOICES, STUDY_PROGRAM_CHOICES, YEAR_OF_STUDY_CHOIC
 
 
 class UserManager(BaseUserManager):
+    def normalize_email(self, email):
+        email = super().normalize_email(email or '')
+        return email.strip().lower()
+
+    def get_by_natural_key(self, username):
+        return self.get(email__iexact=self.normalize_email(username))
+
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError(_('Email is required'))
@@ -29,6 +37,10 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('study_program', 'medicine')
         extra_fields.setdefault('year_of_study', 'postgrad')
         extra_fields.setdefault('country_of_origin', 'IT')
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff=True.'))
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser=True.'))
         return self.create_user(email, password, **extra_fields)
 
 
@@ -66,6 +78,10 @@ class User(AbstractBaseUser, PermissionsMixin):
             return _('Moderator')
         return _('Student')
 
+    @property
+    def can_moderate_community_content(self):
+        return bool(self.is_superuser or self.is_moderator)
+
 
 class RateLimitRecord(models.Model):
     action = models.CharField(max_length=50)
@@ -80,13 +96,18 @@ class RateLimitRecord(models.Model):
     def allow(cls, action, key, limit, window_seconds):
         now = timezone.now()
         window_start = now - timedelta(seconds=window_seconds)
-        record, _ = cls.objects.get_or_create(action=action, key=key)
-        if record.window_started_at < window_start:
-            record.window_started_at = now
-            record.count = 0
-        if record.count >= limit:
+        with transaction.atomic():
+            record, _ = cls.objects.select_for_update().get_or_create(
+                action=action,
+                key=key,
+                defaults={'window_started_at': now},
+            )
+            if record.window_started_at < window_start:
+                record.window_started_at = now
+                record.count = 0
+            if record.count >= limit:
+                record.save(update_fields=['window_started_at', 'count'])
+                return False
+            record.count += 1
             record.save(update_fields=['window_started_at', 'count'])
-            return False
-        record.count += 1
-        record.save(update_fields=['window_started_at', 'count'])
-        return True
+            return True

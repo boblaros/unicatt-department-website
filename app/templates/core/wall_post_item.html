@@ -9,21 +9,68 @@
     <span class="comment-author">{{ wall_post.author.full_name|default:wall_post.author.email }}</span>
     <span class="comment-time">{{ wall_post.created_at|date:"Y-m-d H:i" }}</span>
   </div>
-  <div class="comment-text">{{ wall_post.body|linebreaksbr }}</div>
+  {% if wall_post.soft_deleted %}
+    <p class="comment-text">{% if CURRENT_LANGUAGE == 'it' %}[commento eliminato]{% else %}[deleted]{% endif %}</p>
+  {% else %}
+    <div class="comment-text">{{ wall_post.body|linebreaksbr }}</div>
+  {% endif %}
 
-  {% if request.user.is_authenticated and not request.user.is_banned and depth < 5 %}
-    <form method="post" action="{% url 'core:create_wall_post' %}" class="form-shell wall-post-form wall-reply-form">
+  {% if request.user.is_authenticated and not request.user.is_banned and depth < 5 and not wall_post.soft_deleted %}
+    <form
+      method="post"
+      action="{% url 'core:create_wall_post' %}"
+      class="form-shell wall-post-form wall-reply-form"
+      id="wall-reply-form-{{ wall_post.id }}"
+      data-status-id="wall-action-status-{{ wall_post.id }}"
+    >
       {% csrf_token %}
       <input type="hidden" name="parent_id" value="{{ wall_post.id }}">
       <div class="field-row">
         <label for="wall-reply-{{ wall_post.id }}">{% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}</label>
         <textarea id="wall-reply-{{ wall_post.id }}" name="body" rows="1" maxlength="800" required class="input-control" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Scrivi una risposta...{% else %}Write a reply...{% endif %}"></textarea>
       </div>
-      <div class="actions-row">
-        <button class="gc-btn gc-btn-ghost" type="submit">{% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}</button>
-      </div>
-      <div class="wall-form-status" aria-live="polite"></div>
     </form>
+  {% endif %}
+
+  {% if request.user.is_authenticated and not wall_post.soft_deleted %}
+    {% if not request.user.is_banned and depth < 5 %}
+      <div class="thread-action-row">
+        <button type="submit" form="wall-reply-form-{{ wall_post.id }}" class="gc-btn gc-btn-ghost thread-action-btn">
+          {% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}
+        </button>
+        {% if request.user.can_moderate_community_content %}
+          <form
+            method="post"
+            action="{% url 'core:delete_wall_post' wall_post.id %}"
+            class="thread-delete-form js-thread-delete-form"
+            data-thread-item-id="wall-post-{{ wall_post.id }}"
+            data-status-id="wall-action-status-{{ wall_post.id }}"
+          >
+            {% csrf_token %}
+            <button type="submit" class="gc-btn gc-btn-ghost thread-action-btn thread-action-btn-danger">
+              {% if CURRENT_LANGUAGE == 'it' %}Elimina{% else %}Delete{% endif %}
+            </button>
+          </form>
+        {% endif %}
+        <div class="thread-action-status wall-form-status" id="wall-action-status-{{ wall_post.id }}" aria-live="polite"></div>
+      </div>
+    {% elif request.user.can_moderate_community_content %}
+      <div class="thread-action-row">
+        <form
+          method="post"
+          action="{% url 'core:delete_wall_post' wall_post.id %}"
+          class="thread-delete-form js-thread-delete-form"
+          data-thread-item-id="wall-post-{{ wall_post.id }}"
+          data-status-id="wall-action-status-{{ wall_post.id }}"
+        >
+          {% csrf_token %}
+          <button type="submit" class="gc-btn gc-btn-ghost thread-action-btn thread-action-btn-danger">
+            {% if CURRENT_LANGUAGE == 'it' %}Elimina{% else %}Delete{% endif %}
+          </button>
+        </form>
+        <div class="thread-action-status wall-form-status" id="wall-action-status-{{ wall_post.id }}" aria-live="polite"></div>
+      </div>
+    {% endif %}
   {% endif %}
 
   <div class="wall-replies" id="wall-replies-{{ wall_post.id }}">

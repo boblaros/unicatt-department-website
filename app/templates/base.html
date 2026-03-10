@@ -80,6 +80,35 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   (function () {
+    function parseJsonSafe(raw) {
+      try {
+        return raw ? JSON.parse(raw) : {};
+      } catch (err) {
+        return {};
+      }
+    }
+
+    function htmlToNode(html) {
+      var shell = document.createElement('template');
+      shell.innerHTML = html.trim();
+      return shell.content.firstElementChild;
+    }
+
+    function replaceNodePreservingViewport(currentNode, nextNode) {
+      if (!currentNode || !nextNode) {
+        return;
+      }
+
+      var top = currentNode.getBoundingClientRect().top;
+      currentNode.replaceWith(nextNode);
+
+      var replacement = document.getElementById(nextNode.id) || nextNode;
+      var delta = replacement.getBoundingClientRect().top - top;
+      if (delta) {
+        window.scrollBy(0, delta);
+      }
+    }
+
     var anchors = document.querySelectorAll('a[href^="#"]');
     var siteHeader = document.querySelector('.site-header');
     anchors.forEach(function (anchor) {
@@ -122,6 +151,67 @@
 
     revealItems.forEach(function (item) {
       observer.observe(item);
+    });
+
+    document.addEventListener('submit', function (event) {
+      var form = event.target;
+      if (!form.classList.contains('js-thread-delete-form')) {
+        return;
+      }
+      event.preventDefault();
+
+      if (form.dataset.submitting === '1') {
+        return;
+      }
+      form.dataset.submitting = '1';
+
+      var submitBtn = form.querySelector('button[type="submit"]');
+      var item = document.getElementById(form.dataset.threadItemId || '');
+      var status = document.getElementById(form.dataset.statusId || '');
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+      }
+      if (status) {
+        status.textContent = '';
+      }
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        credentials: 'same-origin',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(function (response) {
+        return response.text().then(function (raw) {
+          return { response: response, data: parseJsonSafe(raw) };
+        });
+      })
+      .then(function (payload) {
+        var response = payload.response;
+        var data = payload.data || {};
+        if (!response.ok || !data.ok || !data.html) {
+          throw new Error(data.error || "{% trans 'Unable to delete this message right now.' %}");
+        }
+
+        var node = htmlToNode(data.html);
+        if (!node || !item) {
+          throw new Error("{% trans 'Unable to refresh the deleted thread item.' %}");
+        }
+
+        replaceNodePreservingViewport(item, node);
+      })
+      .catch(function (error) {
+        if (status) {
+          status.textContent = error.message;
+        }
+      })
+      .finally(function () {
+        form.dataset.submitting = '0';
+        if (submitBtn) {
+          submitBtn.disabled = false;
+        }
+      });
     });
   })();
 </script>

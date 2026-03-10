@@ -1033,12 +1033,51 @@ textarea.input {
 .comment-text {
   margin: 8px 0 10px 0;
   color: rgba(11, 18, 32, 0.93);
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-size: 15px;
   line-height: 1.5;
 }
 
 .reply-form {
   display: grid;
   gap: 8px;
+  margin-bottom: 12px;
+}
+
+.thread-action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 10px 0;
+}
+
+.thread-delete-form {
+  margin: 0;
+}
+
+.thread-action-btn {
+  min-height: 34px;
+  border-radius: 12px;
+  padding: 7px 12px;
+  font-size: 12px;
+}
+
+.thread-action-btn-danger {
+  border-color: rgba(220, 38, 38, 0.22);
+  background: rgba(254, 242, 242, 0.92);
+  color: #b91c1c;
+}
+
+.thread-action-btn-danger:hover {
+  border-color: rgba(220, 38, 38, 0.3);
+  background: rgba(254, 226, 226, 0.96);
+}
+
+.thread-action-row .comment-form-status,
+.thread-action-row .wall-form-status {
+  flex: 1 1 180px;
+  margin-top: 0;
 }
 
 .reply-form textarea {
@@ -1047,6 +1086,15 @@ textarea.input {
 
 .wall-reply-form textarea {
   min-height: 58px;
+}
+
+.wall-reply-form {
+  margin-bottom: 12px;
+}
+
+.comment-card .input-control,
+.comment-card textarea {
+  margin-bottom: 2px;
 }
 
 .comment-replies {
@@ -1323,6 +1371,7 @@ textarea.input {
     margin: 0 0 10px 0;
     text-align: left;
   }
+
 }
 
 @media (prefers-reduced-motion: reduce) {

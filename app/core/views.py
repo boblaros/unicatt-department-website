@@ -64,12 +64,11 @@ def create_wall_post(request):
         wall_post.author = request.user
         wall_post.parent = parent
         try:
-            wall_post.full_clean()
+            wall_post.save()
         except ValidationError as exc:
             if is_ajax:
                 return JsonResponse({'ok': False, 'error': exc.messages[0]}, status=400)
             return redirect(f"{reverse('core:home')}#wall")
-        wall_post.save()
         if is_ajax:
             html = render_to_string(
                 'core/wall_post_item.html',
@@ -89,6 +88,27 @@ def create_wall_post(request):
         if form.errors:
             error_text = str(next(iter(form.errors.values()))[0])
         return JsonResponse({'ok': False, 'error': error_text}, status=400)
+    return redirect(f"{reverse('core:home')}#wall")
+
+
+@login_required
+@require_POST
+def delete_wall_post(request, pk):
+    wall_post = get_object_or_404(WallPost, pk=pk)
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if not request.user.can_moderate_community_content:
+        if is_ajax:
+            return JsonResponse({'ok': False, 'error': _('You cannot delete this wall post.')}, status=403)
+        return HttpResponseForbidden(_('You cannot delete this wall post.'))
+    if not wall_post.soft_deleted:
+        wall_post.soft_delete(request.user)
+    if is_ajax:
+        html = render_to_string(
+            'core/wall_post_item.html',
+            {'wall_post': wall_post, 'depth': wall_post.depth},
+            request=request,
+        )
+        return JsonResponse({'ok': True, 'post_id': wall_post.id, 'html': html})
     return redirect(f"{reverse('core:home')}#wall")
 
 

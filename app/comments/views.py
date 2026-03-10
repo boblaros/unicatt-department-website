@@ -41,12 +41,11 @@ def create_comment_view(request, slug):
         comment.author = request.user
         comment.parent = parent
         try:
-            comment.full_clean()
+            comment.save()
         except ValidationError as exc:
             if is_ajax:
                 return JsonResponse({'ok': False, 'error': exc.messages[0]}, status=400)
             return redirect(f"{reverse('posts:detail', kwargs={'slug': slug})}#comments")
-        comment.save()
         if is_ajax:
             html = render_to_string(
                 'comments/comment_item.html',
@@ -67,9 +66,19 @@ def create_comment_view(request, slug):
 @require_POST
 def delete_comment_view(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
-    can_delete = request.user == comment.author or request.user.is_superuser or request.user.is_moderator
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    can_delete = request.user == comment.author or request.user.can_moderate_community_content
     if not can_delete:
+        if is_ajax:
+            return JsonResponse({'ok': False, 'error': _('You cannot delete this comment.')}, status=403)
         return HttpResponseForbidden(_('You cannot delete this comment.'))
     if not comment.soft_deleted:
         comment.soft_delete(request.user)
+    if is_ajax:
+        html = render_to_string(
+            'comments/comment_item.html',
+            {'comment': comment, 'depth': comment.depth},
+            request=request,
+        )
+        return JsonResponse({'ok': True, 'comment_id': comment.id, 'html': html})
     return redirect(f"{reverse('posts:detail', kwargs={'slug': comment.post.slug})}#comments")

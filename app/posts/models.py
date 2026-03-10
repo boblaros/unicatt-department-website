@@ -1,11 +1,11 @@
 import io
-import os
 from uuid import uuid4
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import models
+from django.db import transaction
 from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
@@ -83,6 +83,11 @@ class PostImage(models.Model):
     def __str__(self):
         return _('Image for %(post_id)s') % {'post_id': self.post_id}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._original_image_name = self.image.name if self.image else ''
+        self._original_thumbnail_name = self.thumbnail.name if self.thumbnail else ''
+
     def clean(self):
         uploaded = self.image
         if not uploaded:
@@ -96,34 +101,100 @@ class PostImage(models.Model):
         if uploaded.size > settings.MAX_UPLOAD_SIZE_BYTES:
             raise ValidationError(_('Image exceeds max size of %(size)sMB.') % {'size': settings.MAX_UPLOAD_SIZE_MB})
 
+    def _image_has_changed(self):
+        if not self.image:
+            return False
+        if self.pk is None:
+            return True
+        if not getattr(self.image, '_committed', True):
+            return True
+        return self.image.name != self._original_image_name
+
+    def _process_image_file(self):
+        self.image.open('rb')
+        try:
+            with Image.open(self.image) as img:
+                clean_img, save_format, ext = self._normalized_image(img)
+                original_file = self._make_content_file(clean_img, save_format, ext, quality=90)
+
+                thumb = clean_img.copy()
+                thumb.thumbnail((320, 320))
+                thumb_file = self._make_content_file(thumb, save_format, ext, quality=85, prefix='thumb_')
+        except OSError as exc:
+            raise ValidationError(_('Uploaded file is not a valid image.')) from exc
+        finally:
+            self.image.close()
+
+        return original_file, thumb_file
+
+    def _normalized_image(self, image):
+        original_format = (image.format or 'JPEG').upper()
+        if original_format == 'JPG':
+            original_format = 'JPEG'
+        if original_format not in {'JPEG', 'PNG', 'WEBP'}:
+            original_format = 'JPEG'
+
+        if original_format == 'JPEG':
+            return image.convert('RGB'), original_format, 'jpg'
+        if image.mode in {'RGB', 'RGBA', 'L', 'LA'}:
+            clean_img = image.copy()
+        else:
+            clean_img = image.convert('RGBA' if 'A' in image.getbands() else 'RGB')
+        return clean_img, original_format, original_format.lower()
+
+    def _make_content_file(self, image, save_format, ext, quality, prefix=''):
+        buffer = io.BytesIO()
+        save_kwargs = {}
+        if save_format == 'JPEG':
+            save_kwargs.update({'quality': quality, 'optimize': True})
+        elif save_format == 'WEBP':
+            save_kwargs.update({'quality': quality, 'method': 6})
+        else:
+            save_kwargs.update({'optimize': True})
+        image.save(buffer, format=save_format, **save_kwargs)
+        return ContentFile(buffer.getvalue(), name=f'{prefix}{uuid4().hex}.{ext}')
+
+    def _delete_storage_file(self, name):
+        if not name:
+            return
+        storage = self.image.storage
+        if storage.exists(name):
+            storage.delete(name)
+
     def save(self, *args, **kwargs):
         self.full_clean(exclude=['thumbnail'])
-        super().save(*args, **kwargs)
-        if not self.image:
-            return
-        self._strip_exif_and_generate_thumbnail()
+        image_changed = self._image_has_changed()
+        old_files = [name for name in [self._original_image_name, self._original_thumbnail_name] if name]
 
-    def _strip_exif_and_generate_thumbnail(self):
-        self.image.open('rb')
-        with Image.open(self.image) as img:
-            mode = 'RGB' if img.mode not in ('RGB', 'L') else img.mode
-            clean_img = img.convert(mode)
+        if image_changed:
+            processed_image, processed_thumbnail = self._process_image_file()
+            self.image = processed_image
+            self.thumbnail = processed_thumbnail
+            update_fields = kwargs.get('update_fields')
+            if update_fields is not None:
+                kwargs['update_fields'] = set(update_fields) | {'image', 'thumbnail'}
 
-            original_buffer = io.BytesIO()
-            original_format = img.format or 'JPEG'
-            save_format = 'JPEG' if original_format.upper() == 'JPG' else original_format.upper()
-            if save_format not in {'JPEG', 'PNG', 'WEBP'}:
-                save_format = 'JPEG'
-            ext = save_format.lower()
-            clean_img.save(original_buffer, format=save_format, quality=90)
-            original_name = os.path.basename(self.image.name)
-            self.image.save(original_name, ContentFile(original_buffer.getvalue()), save=False)
+        try:
+            with transaction.atomic():
+                result = super().save(*args, **kwargs)
+                if image_changed:
+                    transaction.on_commit(lambda: [self._delete_storage_file(name) for name in old_files])
+        except Exception:
+            if image_changed:
+                self._delete_storage_file(self.image.name)
+                self._delete_storage_file(self.thumbnail.name)
+            raise
 
-            thumb = clean_img.copy()
-            thumb.thumbnail((320, 320))
-            thumb_buffer = io.BytesIO()
-            thumb.save(thumb_buffer, format=save_format, quality=85)
-            thumb_name = f'thumb_{uuid4().hex}.{ext}'
-            self.thumbnail.save(thumb_name, ContentFile(thumb_buffer.getvalue()), save=False)
+        self._original_image_name = self.image.name if self.image else ''
+        self._original_thumbnail_name = self.thumbnail.name if self.thumbnail else ''
+        return result
 
-        super().save(update_fields=['image', 'thumbnail'])
+    def delete(self, *args, **kwargs):
+        image_name = self.image.name if self.image else ''
+        thumbnail_name = self.thumbnail.name if self.thumbnail else ''
+        with transaction.atomic():
+            result = super().delete(*args, **kwargs)
+            transaction.on_commit(
+                lambda: [self._delete_storage_file(name) for name in [image_name, thumbnail_name] if name]
+            )
+        return result

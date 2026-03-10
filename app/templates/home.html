@@ -71,10 +71,10 @@
       <p class="join-desc">
         {% if CURRENT_LANGUAGE == 'it' %}
           Registrazione rapida con email universitaria. Sono ammessi solo indirizzi `@unicatt.it` o `@icatt.it`.
-          Dopo la registrazione ricevi la password via email.
+          Dopo la registrazione ricevi un link sicuro per impostare la password.
         {% else %}
           Quick registration with your university email (@unicatt.it).
-          Your password will be sent to you after signup.
+          We will email you a secure link to set your password after signup.
         {% endif %}
       </p>
 
@@ -337,7 +337,10 @@
       form.dataset.submitting = '1';
 
       var submitBtn = form.querySelector('button[type="submit"]');
-      var status = form.querySelector('.wall-form-status');
+      if (!submitBtn && form.id) {
+        submitBtn = document.querySelector('button[form="' + form.id + '"]');
+      }
+      var status = document.getElementById(form.dataset.statusId || '') || form.querySelector('.wall-form-status');
       var textarea = form.querySelector('textarea[name="body"]');
 
       if (submitBtn) {

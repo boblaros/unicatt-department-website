@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import authenticate
+from django.contrib.auth.forms import SetPasswordForm
 from django.utils.translation import gettext_lazy as _
 
 from .choices import ALLOWED_EMAIL_DOMAINS
@@ -8,6 +9,10 @@ from .models import User
 
 def _email_domain(email):
     return email.split('@')[-1].lower() if '@' in email else ''
+
+
+def _normalize_email(email):
+    return email.strip().lower()
 
 
 class LoginForm(forms.Form):
@@ -24,6 +29,8 @@ class LoginForm(forms.Form):
         email = cleaned.get('email')
         password = cleaned.get('password')
         if email and password:
+            email = _normalize_email(email)
+            cleaned['email'] = email
             user = authenticate(self.request, username=email, password=password)
             if not user:
                 raise forms.ValidationError(_('Invalid credentials.'))
@@ -43,7 +50,7 @@ class RegistrationForm(forms.ModelForm):
         fields = ['email', 'full_name', 'study_program', 'year_of_study', 'country_of_origin']
 
     def clean_email(self):
-        email = self.cleaned_data['email'].strip().lower()
+        email = _normalize_email(self.cleaned_data['email'])
         domain = _email_domain(email)
         if domain not in ALLOWED_EMAIL_DOMAINS:
             raise forms.ValidationError(_('Only @unicatt.it and @icatt.it emails are allowed.'))
@@ -56,8 +63,15 @@ class ForgotPasswordForm(forms.Form):
     email = forms.EmailField()
 
     def clean_email(self):
-        email = self.cleaned_data['email'].strip().lower()
+        email = _normalize_email(self.cleaned_data['email'])
         domain = _email_domain(email)
         if domain not in ALLOWED_EMAIL_DOMAINS:
             raise forms.ValidationError(_('Only university student emails are supported.'))
         return email
+
+
+class PasswordSetupForm(SetPasswordForm):
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(user, *args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'autocomplete': 'new-password'})
