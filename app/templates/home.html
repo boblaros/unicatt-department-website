@@ -265,7 +265,7 @@
   <div class="wall wall-single">
     <div class="panel reveal">
       <h3>{% if CURRENT_LANGUAGE == 'it' %}Scrivi un messaggio breve sulla bacheca comune.{% else %}Write a short message to the shared wall.{% endif %}</h3>
-      {% if request.user.is_authenticated %}
+      {% if request.user.is_authenticated and request.user.is_verified_student and not request.user.is_banned %}
       <form method="post" action="{% url 'core:create_wall_post' %}" class="form-shell wall-post-form" id="wall-form">
         {% csrf_token %}
         <div class="field-row">
@@ -276,6 +276,10 @@
         </div>
         <div class="wall-form-status" id="wall-form-status" aria-live="polite"></div>
       </form>
+      {% elif request.user.is_authenticated and request.user.is_banned %}
+      <p class="field-error">{% if CURRENT_LANGUAGE == 'it' %}Sei stato escluso e non puoi pubblicare sulla bacheca.{% else %}You are banned and cannot post on the wall.{% endif %}</p>
+      {% elif request.user.is_authenticated %}
+      <p>{% if CURRENT_LANGUAGE == 'it' %}Solo gli studenti verificati possono pubblicare sulla bacheca.{% else %}Only verified students can post on the wall.{% endif %}</p>
       {% else %}
       <p>{% if CURRENT_LANGUAGE == 'it' %}Per pubblicare sulla bacheca devi prima accedere o registrarti.{% else %}To post on the wall, please login or register first.{% endif %}</p>
       <div class="actions-row">

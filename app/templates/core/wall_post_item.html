@@ -12,7 +12,7 @@
   </div>
   <div class="comment-text">{{ wall_post.body|linebreaksbr }}</div>
 
-  {% if request.user.is_authenticated and not request.user.is_banned and depth < 5 %}
+  {% if request.user.is_authenticated and request.user.is_verified_student and not request.user.is_banned and depth < 5 %}
     <form
       method="post"
       action="{% url 'core:create_wall_post' %}"
@@ -29,12 +29,12 @@
   {% endif %}
 
   {% if request.user.is_authenticated %}
-    {% if not request.user.is_banned and depth < 5 %}
+    {% if request.user.is_verified_student and not request.user.is_banned and depth < 5 %}
       <div class="thread-action-row">
         <button type="submit" form="wall-reply-form-{{ wall_post.id }}" class="gc-btn gc-btn-ghost thread-action-btn">
           {% if CURRENT_LANGUAGE == 'it' %}Invia{% else %}Post{% endif %}
         </button>
-        {% if request.user.can_moderate_community_content %}
+        {% if request.user == wall_post.author or request.user.can_moderate_community_content %}
           <form
             method="post"
             action="{% url 'core:delete_wall_post' wall_post.id %}"
@@ -50,7 +50,7 @@
         {% endif %}
         <div class="thread-action-status wall-form-status" id="wall-action-status-{{ wall_post.id }}" aria-live="polite"></div>
       </div>
-    {% elif request.user.can_moderate_community_content %}
+    {% elif request.user == wall_post.author or request.user.can_moderate_community_content %}
       <div class="thread-action-row">
         <form
           method="post"

@@ -104,6 +104,25 @@ class CommentDeletionInteractionTests(TestCase):
             country_of_origin='IT',
             is_verified_student=True,
         )
+        self.other_user = User.objects.create_user(
+            email='other@unicatt.it',
+            password='StudentPass123!',
+            full_name='Other Student',
+            study_program='medicine',
+            year_of_study='2',
+            country_of_origin='IT',
+            is_verified_student=True,
+        )
+        self.moderator = User.objects.create_user(
+            email='moderator@unicatt.it',
+            password='ModeratorPass123!',
+            full_name='Moderator Example',
+            study_program='medicine',
+            year_of_study='3',
+            country_of_origin='IT',
+            is_verified_student=True,
+            is_moderator=True,
+        )
         self.post = Post.objects.create(
             title_it='Titolo',
             title_en='Title',
@@ -115,14 +134,29 @@ class CommentDeletionInteractionTests(TestCase):
         self.comment = Comment.objects.create(post=self.post, author=self.author, body='Root comment')
         self.reply = Comment.objects.create(post=self.post, author=self.author, parent=self.comment, body='Reply comment')
 
-    def test_post_detail_shows_compact_delete_action_for_allowed_users(self):
+    def test_author_sees_delete_action_on_own_comment(self):
         self.client.force_login(self.author)
 
         response = self.client.get(reverse('posts:detail', kwargs={'slug': self.post.slug}))
 
         self.assertContains(response, 'thread-action-row')
+        self.assertContains(response, reverse('comments:delete', kwargs={'pk': self.comment.pk}))
         self.assertContains(response, 'thread-action-btn thread-action-btn-danger')
         self.assertContains(response, 'js-thread-delete-form')
+
+    def test_other_student_does_not_see_delete_action_on_foreign_comment(self):
+        self.client.force_login(self.other_user)
+
+        response = self.client.get(reverse('posts:detail', kwargs={'slug': self.post.slug}))
+
+        self.assertNotContains(response, reverse('comments:delete', kwargs={'pk': self.comment.pk}))
+
+    def test_moderator_sees_delete_action_on_any_comment(self):
+        self.client.force_login(self.moderator)
+
+        response = self.client.get(reverse('posts:detail', kwargs={'slug': self.post.slug}))
+
+        self.assertContains(response, reverse('comments:delete', kwargs={'pk': self.comment.pk}))
 
     def test_post_detail_links_comment_author_name_to_public_profile(self):
         response = self.client.get(reverse('posts:detail', kwargs={'slug': self.post.slug}))
@@ -139,6 +173,25 @@ class CommentDeletionInteractionTests(TestCase):
         self.assertNotContains(response, '[deleted]')
         self.assertNotContains(response, 'Reply comment')
         self.assertNotContains(response, reverse('comments:delete', kwargs={'pk': self.comment.pk}))
+
+    def test_other_student_cannot_delete_comment(self):
+        self.client.force_login(self.other_user)
+
+        response = self.client.post(reverse('comments:delete', kwargs={'pk': self.comment.pk}))
+
+        self.assertEqual(response.status_code, 403)
+        self.comment.refresh_from_db()
+        self.assertFalse(self.comment.soft_deleted)
+
+    def test_moderator_can_delete_any_comment(self):
+        self.client.force_login(self.moderator)
+
+        response = self.client.post(reverse('comments:delete', kwargs={'pk': self.comment.pk}))
+
+        self.assertRedirects(response, f"{reverse('posts:detail', kwargs={'slug': self.post.slug})}#comments")
+        self.comment.refresh_from_db()
+        self.assertTrue(self.comment.soft_deleted)
+        self.assertEqual(self.comment.deleted_by, self.moderator)
 
     def test_ajax_delete_marks_comment_as_removed_without_redirect(self):
         self.client.force_login(self.author)

@@ -49,10 +49,16 @@ class PrivacyView(TemplateView):
 @login_required
 @require_POST
 def create_wall_post(request):
-    if request.user.is_banned:
-        return HttpResponseForbidden(_('Banned users cannot post.'))
-
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if request.user.is_banned:
+        if is_ajax:
+            return JsonResponse({'ok': False, 'error': _('Banned users cannot post.')}, status=403)
+        return HttpResponseForbidden(_('Banned users cannot post.'))
+    if not request.user.is_verified_student:
+        if is_ajax:
+            return JsonResponse({'ok': False, 'error': _('Only verified students can post on the wall.')}, status=403)
+        return HttpResponseForbidden(_('Only verified students can post on the wall.'))
+
     parent_id = request.POST.get('parent_id')
     parent = None
     if parent_id:
@@ -100,7 +106,8 @@ def create_wall_post(request):
 def delete_wall_post(request, pk):
     wall_post = get_object_or_404(WallPost, pk=pk)
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-    if not request.user.can_moderate_community_content:
+    can_delete = request.user == wall_post.author or request.user.can_moderate_community_content
+    if not can_delete:
         if is_ajax:
             return JsonResponse({'ok': False, 'error': _('You cannot delete this wall post.')}, status=403)
         return HttpResponseForbidden(_('You cannot delete this wall post.'))
