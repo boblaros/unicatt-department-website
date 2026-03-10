@@ -1,0 +1,11 @@
+{% with display_name=author.full_name|default:author.email %}
+  {% if author.is_active %}
+    {% if request.user.is_authenticated and request.user.pk == author.pk %}
+      <a class="comment-author comment-author-link" href="{% url 'accounts:profile' %}">{{ display_name }}</a>
+    {% else %}
+      <a class="comment-author comment-author-link" href="{% url 'accounts:public_profile' author.pk %}">{{ display_name }}</a>
+    {% endif %}
+  {% else %}
+    <span class="comment-author">{{ display_name }}</span>
+  {% endif %}
+{% endwith %}

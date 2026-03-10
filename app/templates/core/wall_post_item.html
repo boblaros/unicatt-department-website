@@ -1,21 +1,18 @@
 {% load i18n %}
 {% get_current_language as CURRENT_LANGUAGE %}
+{% if not wall_post.soft_deleted %}
 <article
   class="comment-card wall-thread-item depth-{{ depth }}"
   id="wall-post-{{ wall_post.id }}"
   data-post-id="{{ wall_post.id }}"
 >
   <div class="comment-head">
-    <span class="comment-author">{{ wall_post.author.full_name|default:wall_post.author.email }}</span>
+    {% include 'account/profile_link.html' with author=wall_post.author %}
     <span class="comment-time">{{ wall_post.created_at|date:"Y-m-d H:i" }}</span>
   </div>
-  {% if wall_post.soft_deleted %}
-    <p class="comment-text">{% if CURRENT_LANGUAGE == 'it' %}[commento eliminato]{% else %}[deleted]{% endif %}</p>
-  {% else %}
-    <div class="comment-text">{{ wall_post.body|linebreaksbr }}</div>
-  {% endif %}
+  <div class="comment-text">{{ wall_post.body|linebreaksbr }}</div>
 
-  {% if request.user.is_authenticated and not request.user.is_banned and depth < 5 and not wall_post.soft_deleted %}
+  {% if request.user.is_authenticated and not request.user.is_banned and depth < 5 %}
     <form
       method="post"
       action="{% url 'core:create_wall_post' %}"
@@ -26,17 +23,16 @@
       {% csrf_token %}
       <input type="hidden" name="parent_id" value="{{ wall_post.id }}">
       <div class="field-row">
-        <label for="wall-reply-{{ wall_post.id }}">{% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}</label>
         <textarea id="wall-reply-{{ wall_post.id }}" name="body" rows="1" maxlength="800" required class="input-control" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Scrivi una risposta...{% else %}Write a reply...{% endif %}"></textarea>
       </div>
     </form>
   {% endif %}
 
-  {% if request.user.is_authenticated and not wall_post.soft_deleted %}
+  {% if request.user.is_authenticated %}
     {% if not request.user.is_banned and depth < 5 %}
       <div class="thread-action-row">
         <button type="submit" form="wall-reply-form-{{ wall_post.id }}" class="gc-btn gc-btn-ghost thread-action-btn">
-          {% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}
+          {% if CURRENT_LANGUAGE == 'it' %}Invia{% else %}Post{% endif %}
         </button>
         {% if request.user.can_moderate_community_content %}
           <form
@@ -75,7 +71,10 @@
 
   <div class="wall-replies" id="wall-replies-{{ wall_post.id }}">
     {% for reply in wall_post.replies.all %}
-      {% include 'core/wall_post_item.html' with wall_post=reply depth=depth|add:1 %}
+      {% if not reply.soft_deleted %}
+        {% include 'core/wall_post_item.html' with wall_post=reply depth=depth|add:1 %}
+      {% endif %}
     {% endfor %}
   </div>
 </article>
+{% endif %}

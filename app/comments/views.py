@@ -30,6 +30,10 @@ def create_comment_view(request, slug):
 
     if parent_id:
         parent = get_object_or_404(Comment, pk=parent_id, post=post)
+        if parent.soft_deleted:
+            if is_ajax:
+                return JsonResponse({'ok': False, 'error': _('You cannot reply to a deleted comment.')}, status=400)
+            return redirect(f"{reverse('posts:detail', kwargs={'slug': slug})}#comments")
         if parent.depth >= 5:
             if is_ajax:
                 return JsonResponse({'ok': False, 'error': _('Maximum reply depth reached.')}, status=400)
@@ -75,10 +79,5 @@ def delete_comment_view(request, pk):
     if not comment.soft_deleted:
         comment.soft_delete(request.user)
     if is_ajax:
-        html = render_to_string(
-            'comments/comment_item.html',
-            {'comment': comment, 'depth': comment.depth},
-            request=request,
-        )
-        return JsonResponse({'ok': True, 'comment_id': comment.id, 'html': html})
+        return JsonResponse({'ok': True, 'comment_id': comment.id, 'removed': True})
     return redirect(f"{reverse('posts:detail', kwargs={'slug': comment.post.slug})}#comments")

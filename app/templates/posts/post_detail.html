@@ -60,7 +60,7 @@
       <p>{% trans "Login as a verified student to comment." %}</p>
     {% endif %}
 
-    <div id="comments-list">
+    <div id="comments-list" data-empty-text="{% trans 'No comments yet.' %}">
       {% for comment in comments %}
         {% include 'comments/comment_item.html' with comment=comment depth=1 %}
       {% empty %}

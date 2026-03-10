@@ -3,13 +3,15 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
 from django.db import transaction
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.encoding import force_str
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
+from django.urls import reverse
 
-from .forms import ForgotPasswordForm, LoginForm, PasswordSetupForm, RegistrationForm
+from .forms import DeleteProfileForm, ForgotPasswordForm, LoginForm, PasswordSetupForm, ProfileUpdateForm, RegistrationForm
 from .models import RateLimitRecord, User
 from .utils import EmailDeliveryError, send_password_action_email
 
@@ -43,6 +45,26 @@ def _get_user_from_token(uidb64, token):
     if not default_token_generator.check_token(user, token):
         return None
     return user
+
+
+def _redirect_target(request, fallback_name):
+    next_url = request.POST.get('next') or request.GET.get('next')
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return reverse(fallback_name)
+
+
+def _profile_context(request, profile_user, *, editable_mode, profile_form=None, delete_form=None):
+    return {
+        'profile_user': profile_user,
+        'editable_mode': editable_mode,
+        'profile_form': profile_form or ProfileUpdateForm(instance=request.user),
+        'delete_form': delete_form or DeleteProfileForm(request.user),
+    }
 
 
 @require_http_methods(['GET', 'POST'])
@@ -126,3 +148,76 @@ def set_password_view(request, uidb64, token):
 def logout_view(request):
     logout(request)
     return redirect('core:home')
+
+
+@login_required
+@require_http_methods(['GET'])
+def profile_view(request):
+    context = _profile_context(request, request.user, editable_mode=True)
+    return render(request, 'account/profile.html', context)
+
+
+@require_http_methods(['GET'])
+def public_profile_view(request, pk):
+    profile_user = get_object_or_404(User.objects.filter(is_active=True), pk=pk)
+    context = {
+        'profile_user': profile_user,
+        'editable_mode': False,
+    }
+    return render(request, 'account/profile.html', context)
+
+
+@login_required
+@require_http_methods(['POST'])
+def update_profile_view(request):
+    form = ProfileUpdateForm(request.POST, instance=request.user)
+    if form.is_valid():
+        form.save()
+        messages.success(request, _('Your profile details have been updated.'))
+        return redirect('accounts:profile')
+
+    context = _profile_context(
+        request,
+        request.user,
+        editable_mode=True,
+        profile_form=form,
+    )
+    return render(request, 'account/profile.html', context, status=400)
+
+
+@login_required
+@require_http_methods(['POST'])
+def request_password_reset_view(request):
+    target = _redirect_target(request, 'accounts:profile')
+    if _rate_limited(request, 'password_reset', request.user.email):
+        messages.error(request, _('Too many reset attempts. Please wait and try again.'))
+        return redirect(target)
+
+    try:
+        with transaction.atomic():
+            send_password_action_email(request, request.user, purpose='reset')
+    except EmailDeliveryError:
+        messages.error(request, _('We could not send the email right now. Please try again later.'))
+    else:
+        messages.success(request, _('We sent a secure password reset link to %(email)s.') % {'email': request.user.email})
+    return redirect(target)
+
+
+@login_required
+@require_http_methods(['POST'])
+def delete_profile_view(request):
+    form = DeleteProfileForm(request.user, request.POST)
+    if form.is_valid():
+        with transaction.atomic():
+            request.user.deactivate_profile()
+        logout(request)
+        messages.success(request, _('Your profile has been deleted.'))
+        return redirect('core:home')
+
+    context = _profile_context(
+        request,
+        request.user,
+        editable_mode=True,
+        delete_form=form,
+    )
+    return render(request, 'account/profile.html', context, status=400)

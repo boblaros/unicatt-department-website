@@ -1,18 +1,15 @@
 {% load i18n %}
 {% get_current_language as CURRENT_LANGUAGE %}
+{% if not comment.soft_deleted %}
 <article class="comment-card ms-{{ depth|add:'0' }} mt-2" id="comment-{{ comment.id }}" data-comment-id="{{ comment.id }}">
   <div class="comment-head">
-    <span class="comment-author">{{ comment.author.full_name|default:comment.author.email }}</span>
+    {% include 'account/profile_link.html' with author=comment.author %}
     <span class="comment-time">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
   </div>
 
-  {% if comment.soft_deleted %}
-    <p class="comment-text">{% if CURRENT_LANGUAGE == 'it' %}[commento eliminato]{% else %}[deleted]{% endif %}</p>
-  {% else %}
-    <p class="comment-text">{{ comment.body }}</p>
-  {% endif %}
+  <p class="comment-text">{{ comment.body }}</p>
 
-  {% if request.user.is_authenticated and request.user.is_verified_student and not request.user.is_banned and depth < 5 and not comment.soft_deleted %}
+  {% if request.user.is_authenticated and request.user.is_verified_student and not request.user.is_banned and depth < 5 %}
     <form
       method="post"
       action="{% url 'comments:create' comment.post.slug %}"
@@ -22,15 +19,15 @@
     >
       {% csrf_token %}
       <input type="hidden" name="parent_id" value="{{ comment.id }}">
-      <textarea name="body" rows="1" class="input-control" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}"></textarea>
+      <textarea name="body" rows="1" class="input-control" placeholder="{% if CURRENT_LANGUAGE == 'it' %}Scrivi una risposta...{% else %}Write a reply...{% endif %}"></textarea>
     </form>
   {% endif %}
 
-  {% if request.user.is_authenticated and not comment.soft_deleted %}
+  {% if request.user.is_authenticated %}
     {% if request.user.is_verified_student and not request.user.is_banned and depth < 5 %}
       <div class="thread-action-row">
         <button type="submit" form="comment-reply-form-{{ comment.id }}" class="gc-btn gc-btn-ghost thread-action-btn">
-          {% if CURRENT_LANGUAGE == 'it' %}Rispondi{% else %}Reply{% endif %}
+          {% if CURRENT_LANGUAGE == 'it' %}Invia{% else %}Post{% endif %}
         </button>
         {% if request.user == comment.author or request.user.can_moderate_community_content %}
           <form
@@ -69,7 +66,10 @@
 
   <div class="comment-replies" id="comment-replies-{{ comment.id }}">
     {% for reply in comment.replies.all %}
-      {% include 'comments/comment_item.html' with comment=reply depth=depth|add:1 %}
+      {% if not reply.soft_deleted %}
+        {% include 'comments/comment_item.html' with comment=reply depth=depth|add:1 %}
+      {% endif %}
     {% endfor %}
   </div>
 </article>
+{% endif %}

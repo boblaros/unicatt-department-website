@@ -151,6 +151,84 @@ a {
   background: rgba(255, 255, 255, 0.7);
 }
 
+.user-email-link {
+  display: inline-flex;
+  align-items: center;
+  transition: transform .18s var(--ease), border-color .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
+}
+
+.user-email-link:hover,
+.user-email-link:focus {
+  color: var(--navy);
+  border-color: rgba(29, 78, 216, 0.28);
+  background: rgba(29, 78, 216, 0.08);
+  box-shadow: 0 14px 30px rgba(2, 6, 23, 0.08);
+}
+.profile-kicker {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: rgba(71, 85, 105, 0.9);
+}
+
+.profile-email {
+  margin: 0;
+  color: rgba(71, 85, 105, 0.98);
+  font-size: 14px;
+}
+
+.profile-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.profile-status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(22, 163, 74, 0.22);
+  background: rgba(240, 253, 244, 0.95);
+  color: #166534;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+}
+
+.profile-info-grid {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.profile-info-grid div {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.profile-info-grid dt {
+  margin: 0;
+  color: rgba(71, 85, 105, 0.9);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.profile-info-grid dd {
+  margin: 0;
+  color: rgba(11, 18, 32, 0.96);
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -280,7 +358,11 @@ a {
   letter-spacing: -0.07em;
   line-height: 0.9;
   color: var(--navy);
-  font-size: clamp(44px, 6.1vw, 100px);
+  font-size: clamp(58px, 7.8vw, 132px);
+}
+
+.mega-title-compact {
+  font-size: clamp(50px, 6.4vw, 108px);
 }
 
 .mega-title .stroke {
@@ -288,10 +370,28 @@ a {
   -webkit-text-stroke: 1px rgba(0, 40, 96, 0.45);
 }
 
+.mega-title-relaxed {
+  letter-spacing: -0.03em;
+}
+
+.mega-title-english {
+  letter-spacing: -0.045em;
+}
+
+.mega-title-tail {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.mega-title-dot-spaced {
+  display: inline-block;
+  margin-left: 0.08em;
+}
+
 .subline {
   margin: 0 0 14px 0;
   max-width: 62ch;
-  font-size: clamp(18px, 2vw, 26px);
+  font-size: clamp(16px, 1.55vw, 22px);
   line-height: 1.23;
   color: rgba(11, 18, 32, 0.94);
 }
@@ -351,6 +451,17 @@ a {
   transform: translateY(-1px);
   border-color: rgba(29, 78, 216, 0.3);
   background: rgba(29, 78, 216, 0.08);
+}
+
+.gc-btn-danger {
+  color: #fff;
+  background: linear-gradient(135deg, #991b1b, #dc2626);
+  box-shadow: 0 24px 68px rgba(153, 27, 27, 0.2);
+}
+
+.gc-btn-danger:hover {
+  transform: translateY(-1px);
+  color: #fff;
 }
 
 .join-box,
@@ -1025,6 +1136,107 @@ textarea.input {
   color: var(--navy);
 }
 
+.comment-author-link {
+  transition: color .18s var(--ease), text-decoration-color .18s var(--ease);
+  text-decoration: underline;
+  text-decoration-color: rgba(29, 78, 216, 0.2);
+  text-underline-offset: 0.22em;
+}
+
+.comment-author-link:hover {
+  color: var(--blue);
+  text-decoration-color: rgba(29, 78, 216, 0.56);
+}
+
+.profile-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.profile-main {
+  display: grid;
+  gap: 16px;
+}
+
+.profile-main .form-shell select,
+.join-box .form-shell select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 54px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(71, 85, 105, 0.92) 50%),
+    linear-gradient(135deg, rgba(71, 85, 105, 0.92) 50%, transparent 50%),
+    linear-gradient(rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.12));
+  background-position:
+    calc(100% - 21px) 50%,
+    calc(100% - 15px) 50%,
+    calc(100% - 39px) 50%;
+  background-size: 6px 6px, 6px 6px, 1px 18px;
+  background-repeat: no-repeat;
+}
+
+.profile-summary-card {
+  position: sticky;
+  top: 94px;
+  display: grid;
+  gap: 14px;
+}
+
+.profile-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--navy), var(--blue));
+  color: #fff;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  box-shadow: 0 18px 42px rgba(0, 40, 96, 0.18);
+}
+
+.profile-summary-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.profile-name {
+  margin: 0;
+  font-family: "Space Grotesk", "Manrope", sans-serif;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  color: var(--navy);
+}
+
+.profile-readonly-note {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  color: rgba(71, 85, 105, 0.98);
+  font-size: 14px;
+}
+
+.profile-readonly-panel,
+.danger-zone {
+  position: relative;
+}
+
+.danger-zone {
+  border-color: rgba(220, 38, 38, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(254, 242, 242, 0.88)),
+    radial-gradient(900px 360px at 0% 0%, rgba(220, 38, 38, 0.08), rgba(220, 38, 38, 0) 60%);
+}
+
 .comment-time {
   font-size: 12px;
   color: rgba(71, 85, 105, 0.95);
@@ -1047,17 +1259,19 @@ textarea.input {
 .thread-action-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   flex-wrap: wrap;
   margin: 0 0 10px 0;
 }
 
 .thread-delete-form {
   margin: 0;
+  display: inline-flex;
 }
 
 .thread-action-btn {
   min-height: 34px;
+  min-width: 72px;
   border-radius: 12px;
   padding: 7px 12px;
   font-size: 12px;
@@ -1300,10 +1514,15 @@ textarea.input {
     padding: 12px 0;
   }
 
+  .profile-layout,
   .hero-grid,
   .split,
   .wall {
     grid-template-columns: 1fr;
+  }
+
+  .profile-summary-card {
+    position: static;
   }
 
   .tiles,

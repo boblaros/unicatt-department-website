@@ -82,6 +82,39 @@ class User(AbstractBaseUser, PermissionsMixin):
     def can_moderate_community_content(self):
         return bool(self.is_superuser or self.is_moderator)
 
+    def deactivate_profile(self):
+        deleted_suffix = f'{self.pk}-{int(timezone.now().timestamp())}'
+        self.email = self.__class__.objects.normalize_email(f'deleted-user-{deleted_suffix}@deleted.local')
+        self.full_name = str(_('Deleted user'))
+        self.study_program = 'medicine'
+        self.year_of_study = 'postgrad'
+        self.country_of_origin = 'OTHER'
+        self.is_verified_student = False
+        self.is_moderator = False
+        self.is_banned = False
+        self.is_staff = False
+        self.is_superuser = False
+        self.is_active = False
+        self.set_unusable_password()
+        self.save(
+            update_fields=[
+                'email',
+                'full_name',
+                'study_program',
+                'year_of_study',
+                'country_of_origin',
+                'is_verified_student',
+                'is_moderator',
+                'is_banned',
+                'is_staff',
+                'is_superuser',
+                'is_active',
+                'password',
+            ]
+        )
+        self.groups.clear()
+        self.user_permissions.clear()
+
 
 class RateLimitRecord(models.Model):
     action = models.CharField(max_length=50)

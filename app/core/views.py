@@ -26,7 +26,7 @@ class HomeView(TemplateView):
         context['latest_posts'] = Post.objects.published().prefetch_related('images')[:3]
         context['quick_register_form'] = RegistrationForm()
         context['wall_posts'] = (
-            WallPost.objects.filter(parent__isnull=True)
+            WallPost.objects.filter(parent__isnull=True, soft_deleted=False)
             .select_related('author')
             .prefetch_related(
                 'replies__author',
@@ -57,6 +57,10 @@ def create_wall_post(request):
     parent = None
     if parent_id:
         parent = get_object_or_404(WallPost.objects.select_related('author'), pk=parent_id)
+        if parent.soft_deleted:
+            if is_ajax:
+                return JsonResponse({'ok': False, 'error': _('You cannot reply to a deleted wall post.')}, status=400)
+            return redirect(f"{reverse('core:home')}#wall")
 
     form = WallPostForm(request.POST)
     if form.is_valid():
@@ -103,12 +107,7 @@ def delete_wall_post(request, pk):
     if not wall_post.soft_deleted:
         wall_post.soft_delete(request.user)
     if is_ajax:
-        html = render_to_string(
-            'core/wall_post_item.html',
-            {'wall_post': wall_post, 'depth': wall_post.depth},
-            request=request,
-        )
-        return JsonResponse({'ok': True, 'post_id': wall_post.id, 'html': html})
+        return JsonResponse({'ok': True, 'post_id': wall_post.id, 'removed': True})
     return redirect(f"{reverse('core:home')}#wall")
 
 

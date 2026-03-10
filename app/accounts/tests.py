@@ -223,3 +223,124 @@ class ModeratorUserAdminTests(TestCase):
         self.assertFalse(self.student.is_staff)
         self.assertFalse(self.student.is_superuser)
         self.assertFalse(self.student.is_moderator)
+
+
+@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+class ProfileManagementTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='student@unicatt.it',
+            password='StudentPass123!',
+            full_name='Student Example',
+            study_program='medicine',
+            year_of_study='1',
+            country_of_origin='IT',
+            is_verified_student=True,
+        )
+        self.other_user = User.objects.create_user(
+            email='other@unicatt.it',
+            password='OtherPass123!',
+            full_name='Other Student',
+            study_program='law',
+            year_of_study='2',
+            country_of_origin='US',
+            is_verified_student=True,
+        )
+
+    def test_profile_update_changes_current_user_details(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse('accounts:update_profile'),
+            {
+                'full_name': 'Updated Student',
+                'study_program': 'law',
+                'year_of_study': '2',
+                'country_of_origin': 'US',
+            },
+        )
+
+        self.assertRedirects(response, reverse('accounts:profile'))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.full_name, 'Updated Student')
+        self.assertEqual(self.user.study_program, 'law')
+        self.assertEqual(self.user.year_of_study, '2')
+        self.assertEqual(self.user.country_of_origin, 'US')
+
+    def test_update_route_only_modifies_logged_in_user(self):
+        self.client.force_login(self.user)
+
+        self.client.post(
+            reverse('accounts:update_profile'),
+            {
+                'full_name': 'Attempted takeover',
+                'study_program': 'economics',
+                'year_of_study': '3',
+                'country_of_origin': 'DE',
+            },
+        )
+
+        self.user.refresh_from_db()
+        self.other_user.refresh_from_db()
+        self.assertEqual(self.user.full_name, 'Attempted takeover')
+        self.assertEqual(self.other_user.full_name, 'Other Student')
+        self.assertEqual(self.other_user.study_program, 'law')
+
+    def test_public_profile_is_read_only(self):
+        response = self.client.get(reverse('accounts:public_profile', args=[self.other_user.pk]))
+
+        self.assertContains(response, self.other_user.full_name)
+        self.assertNotContains(response, self.other_user.email)
+        self.assertNotContains(response, reverse('accounts:update_profile'))
+        self.assertNotContains(response, reverse('accounts:delete_profile'))
+        self.assertNotContains(response, reverse('accounts:request_password_reset'))
+        self.assertContains(response, f'href="{reverse("core:home")}#wall"')
+        self.assertNotContains(response, "This page shows the student's public profile only.")
+
+    def test_home_header_links_email_directly_to_full_profile_page(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse('core:home'))
+
+        self.assertContains(response, f'href="{reverse("accounts:profile")}"')
+        self.assertContains(response, self.user.email)
+        self.assertNotContains(response, 'profile-dropdown-card')
+        self.assertNotContains(response, reverse('accounts:request_password_reset'))
+        self.assertNotContains(response, '#danger-zone')
+
+    def test_edit_profile_page_does_not_show_public_preview_button(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse('accounts:profile'))
+
+        self.assertNotContains(response, 'Public preview')
+        self.assertNotContains(response, 'Anteprima pubblica')
+
+    def test_profile_password_reset_request_sends_email(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse('accounts:request_password_reset'),
+            {'next': reverse('core:home')},
+        )
+
+        self.assertRedirects(response, reverse('core:home'))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('/accounts/set-password/', mail.outbox[0].body)
+
+    def test_delete_profile_deactivates_account_and_hides_public_profile(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse('accounts:delete_profile'),
+            {'confirm_email': self.user.email},
+        )
+
+        self.assertRedirects(response, reverse('core:home'))
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.is_active)
+        self.assertNotEqual(self.user.email, 'student@unicatt.it')
+        self.assertEqual(self.user.full_name, 'Deleted user')
+        self.assertNotEqual(str(self.user.pk), self.client.session.get('_auth_user_id'))
+        public_response = self.client.get(reverse('accounts:public_profile', args=[self.user.pk]))
+        self.assertEqual(public_response.status_code, 404)

@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
+{% block title %}
+  {% if editable_mode %}
+    {% if CURRENT_LANGUAGE == 'it' %}Il mio profilo{% else %}{% trans "My profile" %}{% endif %}
+  {% else %}
+    {% if CURRENT_LANGUAGE == 'it' %}Profilo studente{% else %}{% trans "Student profile" %}{% endif %}
+  {% endif %}
+  - Glocal Connections
+{% endblock %}
+
+{% block content %}
+<section class="section pt-0">
+  <div class="profile-layout">
+    <aside class="panel reveal profile-summary-card">
+      <div class="profile-avatar" aria-hidden="true">{{ profile_user.full_name|default:profile_user.email|first|upper }}</div>
+
+      <div class="profile-summary-copy">
+        <p class="profile-kicker">
+          {% if editable_mode %}
+            {% if CURRENT_LANGUAGE == 'it' %}Area personale{% else %}{% trans "Personal area" %}{% endif %}
+          {% else %}
+            {% if CURRENT_LANGUAGE == 'it' %}Profilo pubblico{% else %}{% trans "Public profile" %}{% endif %}
+          {% endif %}
+        </p>
+        <h1 class="profile-name">{{ profile_user.full_name|default:profile_user.email }}</h1>
+        <p class="profile-email">
+          {% if editable_mode %}
+            {{ profile_user.email }}
+          {% elif CURRENT_LANGUAGE == 'it' %}
+            Profilo pubblico studente
+          {% else %}
+            {% trans "Student public profile" %}
+          {% endif %}
+        </p>
+      </div>
+
+      <div class="profile-badges">
+        <span class="meta-pill">{{ profile_user.role }}</span>
+        {% if profile_user.is_verified_student %}
+          <span class="profile-status-pill">
+            {% if CURRENT_LANGUAGE == 'it' %}Studente verificato{% else %}{% trans "Verified student" %}{% endif %}
+          </span>
+        {% endif %}
+      </div>
+
+      <dl class="profile-info-grid">
+        <div>
+          <dt>{% if CURRENT_LANGUAGE == 'it' %}Corso di studi{% else %}{% trans "Study program" %}{% endif %}</dt>
+          <dd>{{ profile_user.get_study_program_display }}</dd>
+        </div>
+        <div>
+          <dt>{% if CURRENT_LANGUAGE == 'it' %}Anno{% else %}{% trans "Year" %}{% endif %}</dt>
+          <dd>{{ profile_user.get_year_of_study_display }}</dd>
+        </div>
+        <div>
+          <dt>{% if CURRENT_LANGUAGE == 'it' %}Paese{% else %}{% trans "Country" %}{% endif %}</dt>
+          <dd>{{ profile_user.get_country_of_origin_display }}</dd>
+        </div>
+        <div>
+          <dt>{% if CURRENT_LANGUAGE == 'it' %}Iscritto dal{% else %}{% trans "Member since" %}{% endif %}</dt>
+          <dd>{{ profile_user.date_joined|date:"Y-m-d" }}</dd>
+        </div>
+      </dl>
+
+    </aside>
+
+    <div class="profile-main">
+      {% if editable_mode %}
+        <section class="panel reveal">
+          <h2>{% if CURRENT_LANGUAGE == 'it' %}Modifica i tuoi dati{% else %}{% trans "Edit your details" %}{% endif %}</h2>
+          <p>
+            {% if CURRENT_LANGUAGE == 'it' %}
+              Aggiorna le informazioni principali del tuo profilo senza toccare la logica di accesso.
+            {% else %}
+              Update the main details shown in your student profile.
+            {% endif %}
+          </p>
+
+          <form method="post" action="{% url 'accounts:update_profile' %}" class="form-shell">
+            {% csrf_token %}
+
+            {% if profile_form.non_field_errors %}
+              <div class="form-error">{{ profile_form.non_field_errors }}</div>
+            {% endif %}
+
+            {% for field in profile_form %}
+              <div class="field-row">
+                <label for="{{ field.id_for_label }}">
+                  {% if CURRENT_LANGUAGE == 'it' %}
+                    {% if field.name == 'full_name' %}
+                      Nome completo
+                    {% elif field.name == 'study_program' %}
+                      Corso di studi
+                    {% elif field.name == 'year_of_study' %}
+                      Anno di corso
+                    {% elif field.name == 'country_of_origin' %}
+                      Paese di provenienza
+                    {% else %}
+                      {{ field.label }}
+                    {% endif %}
+                  {% else %}
+                    {{ field.label }}
+                  {% endif %}
+                </label>
+                {{ field }}
+                {% for error in field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+              </div>
+            {% endfor %}
+
+            <div class="actions-row">
+              <button type="submit" class="gc-btn gc-btn-primary">{% if CURRENT_LANGUAGE == 'it' %}Salva modifiche{% else %}{% trans "Save changes" %}{% endif %}</button>
+              <a class="gc-btn gc-btn-ghost" href="{% url 'core:home' %}">{% if CURRENT_LANGUAGE == 'it' %}Torna alla home{% else %}{% trans "Back home" %}{% endif %}</a>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel reveal">
+          <h2>{% if CURRENT_LANGUAGE == 'it' %}Password e accesso{% else %}{% trans "Password and access" %}{% endif %}</h2>
+          <p>
+            {% if CURRENT_LANGUAGE == 'it' %}
+              Per cambiare la password ti inviamo un link sicuro allo stesso indirizzo email universitario.
+            {% else %}
+              To change your password, we send a secure link to your university email.
+            {% endif %}
+          </p>
+
+          <form method="post" action="{% url 'accounts:request_password_reset' %}" class="form-shell">
+            {% csrf_token %}
+            <button type="submit" class="gc-btn gc-btn-ghost">{% if CURRENT_LANGUAGE == 'it' %}Invia link per cambiare password{% else %}{% trans "Send password reset link" %}{% endif %}</button>
+          </form>
+        </section>
+
+        <section class="panel reveal danger-zone" id="danger-zone">
+          <h2>{% if CURRENT_LANGUAGE == 'it' %}Elimina profilo{% else %}{% trans "Delete profile" %}{% endif %}</h2>
+          <p>
+            {% if CURRENT_LANGUAGE == 'it' %}
+              L'account verrà disattivato e il profilo non sarà più accessibile pubblicamente. Inserisci la tua email per confermare.
+            {% else %}
+              The account will be deactivated and the profile will no longer be publicly available. Enter your email to confirm.
+            {% endif %}
+          </p>
+
+          <form method="post" action="{% url 'accounts:delete_profile' %}" class="form-shell">
+            {% csrf_token %}
+
+            {% if delete_form.non_field_errors %}
+              <div class="form-error">{{ delete_form.non_field_errors }}</div>
+            {% endif %}
+
+            {% for field in delete_form %}
+              <div class="field-row">
+                <label for="{{ field.id_for_label }}">
+                  {% if CURRENT_LANGUAGE == 'it' and field.name == 'confirm_email' %}
+                    Conferma la tua email
+                  {% else %}
+                    {{ field.label }}
+                  {% endif %}
+                </label>
+                {{ field }}
+                {% for error in field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+              </div>
+            {% endfor %}
+
+            <div class="actions-row">
+              <button type="submit" class="gc-btn gc-btn-danger">{% if CURRENT_LANGUAGE == 'it' %}Elimina il mio profilo{% else %}{% trans "Delete my profile" %}{% endif %}</button>
+            </div>
+          </form>
+        </section>
+      {% else %}
+        <section class="panel reveal profile-readonly-panel">
+          <h2>{% if CURRENT_LANGUAGE == 'it' %}Profilo dello studente{% else %}{% trans "Student profile" %}{% endif %}</h2>
+          <div class="actions-row">
+            <a class="gc-btn gc-btn-ghost" href="{% url 'core:home' %}#wall">{% if CURRENT_LANGUAGE == 'it' %}Bacheca comunità{% else %}{% trans "Community wall" %}{% endif %}</a>
+            <a class="gc-btn gc-btn-ghost" href="{% url 'posts:list' %}">{% if CURRENT_LANGUAGE == 'it' %}Notizie{% else %}{% trans "News" %}{% endif %}</a>
+          </div>
+        </section>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

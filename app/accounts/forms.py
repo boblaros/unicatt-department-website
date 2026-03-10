@@ -75,3 +75,23 @@ class PasswordSetupForm(SetPasswordForm):
         super().__init__(user, *args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.update({'autocomplete': 'new-password'})
+
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['full_name', 'study_program', 'year_of_study', 'country_of_origin']
+
+
+class DeleteProfileForm(forms.Form):
+    confirm_email = forms.EmailField()
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_confirm_email(self):
+        confirm_email = _normalize_email(self.cleaned_data['confirm_email'])
+        if confirm_email != _normalize_email(self.user.email):
+            raise forms.ValidationError(_('Enter your current account email to confirm deletion.'))
+        return confirm_email

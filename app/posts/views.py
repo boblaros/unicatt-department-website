@@ -19,7 +19,7 @@ class PostListView(ListView):
 
 def _comment_tree(post):
     comments = (
-        Comment.objects.filter(post=post, parent__isnull=True)
+        Comment.objects.filter(post=post, parent__isnull=True, soft_deleted=False)
         .select_related('author')
         .prefetch_related(
             'replies__author',

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 {% block title %}{% trans "About" %}{% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@
         GLOCAL<br>CONNECTIONS.
       {% endif %}
     </h1>
-    <img class="about-project-logo" src="/static/img/logo-unicatt.svg" alt="Università Cattolica del Sacro Cuore">
+    <img class="about-project-logo" src="{% static 'img/logo-unicatt.svg' %}" alt="Università Cattolica del Sacro Cuore">
 
     {% if CURRENT_LANGUAGE == 'it' %}
       <p class="blurb">

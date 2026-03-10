@@ -113,6 +113,7 @@ class CommentDeletionInteractionTests(TestCase):
             published_at=timezone.now(),
         )
         self.comment = Comment.objects.create(post=self.post, author=self.author, body='Root comment')
+        self.reply = Comment.objects.create(post=self.post, author=self.author, parent=self.comment, body='Reply comment')
 
     def test_post_detail_shows_compact_delete_action_for_allowed_users(self):
         self.client.force_login(self.author)
@@ -123,7 +124,23 @@ class CommentDeletionInteractionTests(TestCase):
         self.assertContains(response, 'thread-action-btn thread-action-btn-danger')
         self.assertContains(response, 'js-thread-delete-form')
 
-    def test_ajax_delete_returns_updated_comment_html_without_redirect(self):
+    def test_post_detail_links_comment_author_name_to_public_profile(self):
+        response = self.client.get(reverse('posts:detail', kwargs={'slug': self.post.slug}))
+
+        self.assertContains(response, reverse('accounts:public_profile', args=[self.author.pk]))
+
+    def test_deleted_comment_disappears_from_post_detail(self):
+        self.comment.soft_delete(self.author)
+        self.client.force_login(self.author)
+
+        response = self.client.get(reverse('posts:detail', kwargs={'slug': self.post.slug}))
+
+        self.assertContains(response, 'No comments yet.')
+        self.assertNotContains(response, '[deleted]')
+        self.assertNotContains(response, 'Reply comment')
+        self.assertNotContains(response, reverse('comments:delete', kwargs={'pk': self.comment.pk}))
+
+    def test_ajax_delete_marks_comment_as_removed_without_redirect(self):
         self.client.force_login(self.author)
 
         response = self.client.post(
@@ -134,7 +151,7 @@ class CommentDeletionInteractionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertTrue(data['ok'])
+        self.assertTrue(data['removed'])
+        self.assertNotIn('html', data)
         self.comment.refresh_from_db()
         self.assertTrue(self.comment.soft_deleted)
-        self.assertIn('[deleted]', data['html'])
-        self.assertNotIn(reverse('comments:delete', kwargs={'pk': self.comment.pk}), data['html'])
